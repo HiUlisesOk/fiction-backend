@@ -30,11 +30,11 @@ module.exports = (sequelize) => {
 			},
 			birthDate: {
 				type: DataTypes.DATEONLY,
-				allowNull: false,
+				allowNull: true,
 			},
 			email: {
 				type: DataTypes.STRING,
-				allowNull: true,
+				allowNull: false,
 				defaultValue: "Aún no tenemos los pasos de esta receta",
 			},
 			password: {

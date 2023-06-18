@@ -35,10 +35,9 @@ async function createUser(
 	if (!username) throw new Error("Falta firstName");
 	if (!firstName) throw new Error("Falta firstName");
 	if (!lastName) throw new Error("Falta lastName");
-	if (!birthDate) throw new Error("Falta birthDate");
 	if (!email) throw new Error("Falta email");
 	if (!password) throw new Error("Falta password");
-	if (!userScore) throw new Error("Falta userScore");
+
 
 	const matchingUser = await User.findOne({
 		where: {
