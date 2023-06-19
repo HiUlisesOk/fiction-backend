@@ -50,7 +50,8 @@ server.post("/login", async (req, res, next) => {
     // // Establecer el token en una cookie
     // res.cookie('token', token, { httpOnly: true });
 
-    res.json({ message: 'Inicio de sesión exitoso', token, user });
+    res.json({ message: 'Inicio de sesión exitoso', token, user, passwordsMatch });
+    next();
   } catch (error) {
     next(error);
   }
