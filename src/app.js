@@ -34,9 +34,10 @@ server.post("/login", async (req, res, next) => {
   try {
     const { email, password } = req.body;
     const login = await AuthLogin(email, password)
-    console.log('login', login)
+    const { user, passwordsMatch } = login;
+    console.log('login', passwordsMatch, user)
 
-    if (!login) {
+    if (!passwordsMatch) {
       res.status(401).json({ error: `Credenciales inválidas` });
       return;
     }
@@ -48,7 +49,7 @@ server.post("/login", async (req, res, next) => {
     // Establecer el token en una cookie
     res.cookie('token', token, { httpOnly: true });
 
-    res.json({ message: 'Inicio de sesión exitoso', token });
+    res.json({ message: 'Inicio de sesión exitoso', token, });
   } catch (error) {
     next(error);
   }
