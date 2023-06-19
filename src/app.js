@@ -14,12 +14,10 @@ require("./db.js");
 const server = express();
 server.name = "API";
 
-const sessions = require('express-session');
 
 server.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
 server.use(bodyParser.json({ limit: "50mb" }));
-server.use(cookieParser());
-server.use(morgan("dev"));
+
 
 server.use(
   session({
@@ -29,6 +27,9 @@ server.use(
     cookie: { secure: false } // Cambia a true si usas HTTPS
   })
 );
+
+server.use(cookieParser());
+server.use(morgan("dev"));
 
 server.post("/login", async (req, res, next) => {
   try {
@@ -47,7 +48,7 @@ server.post("/login", async (req, res, next) => {
 
 
     // // Establecer el token en una cookie
-    res.cookie('token', token, { httpOnly: true });
+    res.cookie('token', token, { httpOnly: true, sameSite: 'none', secure: true }); // Añade SameSite y Secure
 
     res.json({ message: 'Inicio de sesión exitoso', token, user });
   } catch (error) {
@@ -61,7 +62,7 @@ server.use((req, res, next) => {
   res.header("Access-Control-Allow-Credentials", "true");
   res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  res.header("Set-Cookie", `token=${token}; SameSite=None; Secure`); // Añade SameSite=None y Secure a tu encabezado Set-Cookie
+
   next();
 });
 
