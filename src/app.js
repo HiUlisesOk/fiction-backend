@@ -46,7 +46,7 @@ server.post("/login", async (req, res, next) => {
     const token = jwt.sign({ email }, process.env.secretToken);
 
 
-    // Establecer el token en una cookie
+    // // Establecer el token en una cookie
     res.cookie('token', token, { httpOnly: true });
 
     res.json({ message: 'Inicio de sesión exitoso', token, user });
@@ -61,7 +61,7 @@ server.use((req, res, next) => {
   res.header("Access-Control-Allow-Credentials", "true");
   res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  res.header("Set-Cookie", "cookie_name=cookie_value; SameSite=None; Secure"); // Añade SameSite=None y Secure a tu encabezado Set-Cookie
+  res.header("Set-Cookie", `token=${token}; SameSite=None; Secure`); // Añade SameSite=None y Secure a tu encabezado Set-Cookie
   next();
 });
 
