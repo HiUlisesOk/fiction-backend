@@ -13,7 +13,7 @@ require("./db.js");
 
 const server = express();
 server.name = "API";
-
+let token;
 
 server.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
 server.use(bodyParser.json({ limit: "50mb" }));
@@ -44,11 +44,11 @@ server.post("/login", async (req, res, next) => {
     }
 
     // Generar el token de autenticación
-    const token = jwt.sign({ email }, process.env.secretToken);
+    token = jwt.sign({ email }, process.env.secretToken);
 
 
     // // Establecer el token en una cookie
-    res.cookie('token', token, { httpOnly: true, sameSite: 'none', secure: false }); // Añade SameSite y Secure
+    res.cookie('token', token, { httpOnly: true });
 
     res.json({ message: 'Inicio de sesión exitoso', token, user });
   } catch (error) {
@@ -62,7 +62,7 @@ server.use((req, res, next) => {
   res.header("Access-Control-Allow-Credentials", "true");
   res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
+  res.header("Set-Cookie", `token=${token}; SameSite=None; Secure`); // Añade SameSite=None y Secure a tu encabezado Set-Cookie
   next();
 });
 
