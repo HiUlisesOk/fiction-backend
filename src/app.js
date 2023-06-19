@@ -44,6 +44,7 @@ server.post("/login", async (req, res, next) => {
     // Generar el token de autenticación
     const token = jwt.sign({ email }, process.env.secretToken);
 
+
     // Establecer el token en una cookie
     res.cookie('token', token, { httpOnly: true });
 
