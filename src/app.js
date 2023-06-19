@@ -61,8 +61,10 @@ server.use((req, res, next) => {
   res.header("Access-Control-Allow-Credentials", "true");
   res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  res.header("Set-Cookie", "cookie_name=cookie_value; SameSite=None; Secure"); // Añade SameSite=None y Secure a tu encabezado Set-Cookie
   next();
 });
+
 
 
 
