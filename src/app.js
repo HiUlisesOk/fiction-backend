@@ -7,14 +7,14 @@ const bcrypt = require('bcrypt');
 const session = require('express-session');
 const jwt = require('jsonwebtoken');
 const { AuthLogin } = require('./controllers/UserControllers.js')
-
+const cors = require('cors');
 require("dotenv").config();
 require("./db.js");
 
 const server = express();
 server.name = "API";
 
-
+server.use(cors({ origin: 'http://localhost:5173', credentials: true }));
 server.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
 server.use(bodyParser.json({ limit: "50mb" }));
 
@@ -48,7 +48,7 @@ server.post("/login", async (req, res, next) => {
 
 
     // // Establecer el token en una cookie
-    res.cookie('token', token, { httpOnly: true });
+    // res.cookie('token', token, { httpOnly: true });
 
     res.json({ message: 'Inicio de sesión exitoso', token, user });
   } catch (error) {
@@ -58,12 +58,13 @@ server.post("/login", async (req, res, next) => {
 
 
 server.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "http://localhost:5173");
+  res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Credentials", "true");
   res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
 });
+
 
 
 
