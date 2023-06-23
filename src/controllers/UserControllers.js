@@ -199,7 +199,7 @@ const AuthLogin = async (email, password) => {
 		console.log('Password from DB:', user.password);
 		console.log('Passwords match:', passwordsMatch);
 
-		return { passwordsMatch, user: { ID, username, firstName, lastName, email } };
+		return { passwordsMatch, user: { ID: user.ID, username: user.username, firstName: user.firstName, email: user.email } };
 	} catch (error) {
 		console.error('Authentication error:', error);
 		throw error;
