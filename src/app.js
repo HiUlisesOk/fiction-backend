@@ -15,8 +15,8 @@ const server = express();
 server.name = "API";
 
 //http://localhost:5173
-server.use(cors({ origin: 'https://roleplay.pages.dev', credentials: true }));
-
+//FRONT=https://roleplay.pages.dev
+server.use(cors({ origin: process.env.FRONT, credentials: true }));
 
 
 server.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));

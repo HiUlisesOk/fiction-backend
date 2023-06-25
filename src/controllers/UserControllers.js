@@ -29,14 +29,12 @@ async function createUser(
 	password,
 	userScore,
 	profilePicture,
-	isAdmin
 ) {
 	//Si falta algun dato devolvemos un error
 	if (!username) throw new Error("Falta firstName");
-	if (!firstName) throw new Error("Falta firstName");
-	if (!lastName) throw new Error("Falta lastName");
 	if (!email) throw new Error("Falta email");
 	if (!password) throw new Error("Falta password");
+
 
 
 	const matchingUser = await User.findOne({
@@ -61,14 +59,8 @@ async function createUser(
 	const [user, userCreated] = await User.findOrCreate({
 		where: {
 			username: username,
-			firstName: firstName,
-			lastName: lastName,
-			profilePicture: profilePicture,
-			birthDate: generateDateOnly(),
 			email: email,
 			password: hashedPassword,
-			userScore: userScore,
-			isAdmin: isAdmin
 		},
 	});
 	console.log(userCreated)
@@ -94,19 +86,8 @@ async function createUser(
 	await user.addTopic(topic);
 	await post.setTopic(topic);
 
-	const newUser = {
-		username,
-		firstName,
-		lastName,
-		birthDate,
-		email,
-		hashedPassword,
-		userScore,
-		profilePicture,
-		isAdmin
-	}
 
-	return newUser;
+	return { message: `El usuario ${username} ha sido creado correctamente`, type: true };
 }
 
 /// <=============== POST - UPDATE USER ===============>
