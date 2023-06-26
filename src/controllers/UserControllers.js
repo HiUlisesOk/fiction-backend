@@ -187,6 +187,9 @@ const AuthLogin = async (email, password) => {
 	}
 };
 
+
+//   ||==============| Upload Image |===============ooo<>
+// To delete an user.
 const deleteUser = async (ID) => {
 	const user = await User.findByPk(ID)
 
@@ -201,9 +204,65 @@ const deleteUser = async (ID) => {
 	return user;
 }
 
+//   ||==============| Upload Image |===============ooo<>
+// Updates an user's profile picture.
+
+async function uploadProfilePicture(imagen64, ID,
+	username,
+	email,
+) {
+	if (!imagen64) throw new Error("Falta userScore");
+	if (!ID) throw new Error("Falta ID del usuario");
+	if (!username) throw new Error("Falta firstName");
+	if (!email) throw new Error("Falta email");
+
+	const matchingUser = await User.findOne({
+		where: {
+			[Op.or]: [{ email: email }, { username: username }, { ID: ID }],
+		},
+		attributes: ['email', 'password'],
+	});
+
+	if (!matchingUser) throw new Error("El usuario no existe");
+
+
+	var data = new FormData();
+	data.append('image', imagen64);
+
+	var config = {
+		method: 'post',
+		maxBodyLength: Infinity,
+		url: 'https://api.imgur.com/3/image',
+		headers: {
+			'Authorization': `Client-ID ${process.env.clientId}`,
+			...data.getHeaders()
+		},
+		data: data
+	};
+
+	axios(config)
+		.then(async function (response) {
+			console.log(JSON.stringify(response.data.link));
+			const link = JSON.stringify(response.data.link)
+			const updateThisUser = await User.update(
+				{
+					profilePicture: link
+				},
+				{
+					where: { ID: ID },
+				}
+			);
+
+		})
+		.catch(function (error) {
+			console.log(error.request);
+		});
+}
+
 
 module.exports = {
 	getAllUsersFromDb,
+	uploadProfilePicture,
 	createUser,
 	AuthLogin,
 	updateUser,

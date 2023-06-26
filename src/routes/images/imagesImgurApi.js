@@ -16,8 +16,6 @@ imagesImgurAPI.get("/get-imgur-image-token", authenticateToken, async (req, res)
 	}
 });
 
-
-
 imagesImgurAPI.post("/upload-image", authenticateToken, async (req, res) => {
 	try {
 		const {

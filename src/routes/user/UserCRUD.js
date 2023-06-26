@@ -6,7 +6,8 @@ const {
 	createUser,
 	AuthLogin,
 	updateUser,
-	deleteUser
+	deleteUser,
+	uploadProfilePicture
 } = require("../../controllers/UserControllers.js");
 
 
@@ -47,6 +48,29 @@ userRouter.post("/create-user", async (req, res) => {
 			isAdmin
 		);
 		res.status(200).send(user);
+	} catch (error) {
+		res.status(400).send(error.message);
+	}
+});
+
+userRouter.put("/update-profilePicture", authenticateToken, async (req, res) => {
+	try {
+		const {
+			imagen64,
+			ID,
+			username,
+			email,
+			profilePicture,
+		} = req.body;
+
+		const profilePic = await uploadProfilePicture(
+			imagen64,
+			ID,
+			username,
+			email,
+			profilePicture,
+		);
+		res.status(200).send(profilePic);
 	} catch (error) {
 		res.status(400).send(error.message);
 	}
