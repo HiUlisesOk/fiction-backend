@@ -36,8 +36,9 @@ function generateAccessToken() {
 
 //   ||==============| Upload Image |===============ooo<>
 // Given a user's refresh token, this endpoint generates an access token.
-
-function uploadImage(imagen64) {
+async function uploadImage(imagen64) {
+	var axios = require('axios');
+	var FormData = require('form-data');
 	var data = new FormData();
 	data.append('image', imagen64);
 
@@ -52,14 +53,16 @@ function uploadImage(imagen64) {
 		data: data
 	};
 
-	axios(config)
-		.then(function (response) {
-			console.log(JSON.stringify(response.data.link));
-
-		})
-		.catch(function (error) {
-			console.log(error.request);
-		});
+	return new Promise((resolve, reject) => {
+		axios(config)
+			.then(function (response) {
+				resolve(response.data.data.link);
+			})
+			.catch(function (error) {
+				reject(error);
+			});
+	});
 }
+
 
 module.exports = { generateAccessToken, uploadImage };

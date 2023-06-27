@@ -9,13 +9,28 @@ const { Op } = require("sequelize");
 const { User, Post, Topic } = require("../db");
 const { generateDateOnly, generateDateTime } = require('../utils/date')
 const bcrypt = require('bcrypt');
+const { uploadImage } = require('../controllers/imagesControllers')
+
+
 /// <=============== controller getAllUsers ===============>
 async function getAllUsersFromDb() {
-	// Guardamos los datos de la API en data
 	const users = await User.findAll();
 	//Si la funcion no recibe nada, devuelve un error.
 	if (!users) throw new Error("No se encontraron usuarios");
 	return users;
+}
+
+/// <=============== controller getUSER ===============>
+async function getUserFromDb(userID) {
+	const matchingUser = await User.findOne({
+		where: {
+			ID: userID,
+		},
+	});
+
+	if (!matchingUser) throw new Error("El usuario no existe");
+	//Si la funcion no recibe nada, devuelve un error.
+	return matchingUser;
 }
 
 /// <=============== POST - CREAR USER CONTROLLER ===============>
@@ -207,10 +222,7 @@ const deleteUser = async (ID) => {
 //   ||==============| Upload Image |===============ooo<>
 // Updates an user's profile picture.
 
-async function uploadProfilePicture(imagen64, ID,
-	username,
-	email,
-) {
+async function uploadProfilePicture(imagen64, ID, username, email) {
 	if (!imagen64) throw new Error("Falta userScore");
 	if (!ID) throw new Error("Falta ID del usuario");
 	if (!username) throw new Error("Falta firstName");
@@ -224,40 +236,38 @@ async function uploadProfilePicture(imagen64, ID,
 	});
 
 	if (!matchingUser) throw new Error("El usuario no existe");
+	console.log(matchingUser);
 
+	try {
+		let link;
+		try {
+			link = await uploadImage(imagen64);
+		} catch (uploadError) {
+			console.error('Error during image upload:', uploadError);
+			throw new Error("Error al cargar la imagen");
+		}
 
-	var data = new FormData();
-	data.append('image', imagen64);
+		if (!link) throw new Error("La función uploadImage no retornó un enlace válido");
+		console.log('link:', link);
 
-	var config = {
-		method: 'post',
-		maxBodyLength: Infinity,
-		url: 'https://api.imgur.com/3/image',
-		headers: {
-			'Authorization': `Client-ID ${process.env.clientId}`,
-			...data.getHeaders()
-		},
-		data: data
-	};
-
-	axios(config)
-		.then(async function (response) {
-			console.log(JSON.stringify(response.data.link));
-			const link = JSON.stringify(response.data.link)
-			const updateThisUser = await User.update(
-				{
-					profilePicture: link
+		const updateThisUser = await User.update(
+			{
+				profilePicture: link,
+			},
+			{
+				where: {
+					[Op.or]: [{ email: email }, { username: username }, { ID: ID }],
 				},
-				{
-					where: { ID: ID },
-				}
-			);
+			}
+		);
 
-		})
-		.catch(function (error) {
-			console.log(error.request);
-		});
+		return updateThisUser;
+	} catch (error) {
+		console.error('Error during profile picture upload:', error);
+		throw error;
+	}
 }
+
 
 
 module.exports = {
@@ -266,5 +276,6 @@ module.exports = {
 	createUser,
 	AuthLogin,
 	updateUser,
-	deleteUser
+	deleteUser,
+	getUserFromDb
 };

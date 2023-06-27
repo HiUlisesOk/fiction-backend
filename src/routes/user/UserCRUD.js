@@ -7,7 +7,8 @@ const {
 	AuthLogin,
 	updateUser,
 	deleteUser,
-	uploadProfilePicture
+	uploadProfilePicture,
+	getUserFromDb,
 } = require("../../controllers/UserControllers.js");
 
 
@@ -15,6 +16,16 @@ userRouter.get("/get-all-users", authenticateToken, async (req, res) => {
 	try {
 		const userList = await getAllUsersFromDb();
 		res.status(200).send(userList);
+	} catch (error) {
+		res.status(401).send(error.message);
+	}
+});
+
+userRouter.get("/get-user-info/:id", authenticateToken, async (req, res) => {
+	try {
+		const userID = req.params.id;
+		const userInfo = await getUserFromDb(userID);
+		res.status(200).send(userInfo);
 	} catch (error) {
 		res.status(401).send(error.message);
 	}
@@ -60,7 +71,6 @@ userRouter.put("/update-profilePicture", authenticateToken, async (req, res) => 
 			ID,
 			username,
 			email,
-			profilePicture,
 		} = req.body;
 
 		const profilePic = await uploadProfilePicture(
@@ -68,7 +78,6 @@ userRouter.put("/update-profilePicture", authenticateToken, async (req, res) => 
 			ID,
 			username,
 			email,
-			profilePicture,
 		);
 		res.status(200).send(profilePic);
 	} catch (error) {
