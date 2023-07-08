@@ -50,8 +50,6 @@ async function createUser(
 	if (!email) throw new Error("Falta email");
 	if (!password) throw new Error("Falta password");
 
-
-
 	const matchingUser = await User.findOne({
 		where: {
 			[Op.or]: [{ email: email }, { username: username }],
@@ -224,9 +222,8 @@ const deleteUser = async (ID) => {
 
 async function uploadProfilePicture(imagen64, ID, username, email) {
 	if (!imagen64) throw new Error("Falta userScore");
-	if (!ID) throw new Error("Falta ID del usuario");
-	if (!username) throw new Error("Falta firstName");
-	if (!email) throw new Error("Falta email");
+	if (!ID && !username && !email) throw new Error("Falta ID, username o email del usuario");
+
 
 	const matchingUser = await User.findOne({
 		where: {
