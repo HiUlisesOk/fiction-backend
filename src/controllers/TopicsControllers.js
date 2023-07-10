@@ -8,6 +8,7 @@
 const { Op } = require("sequelize");
 const { User, Post, Topic } = require("../db");
 const { generateDateOnly, generateDateTime } = require('../utils/date')
+const { createPost } = require('../controllers/PostControllers')
 const bcrypt = require('bcrypt');
 
 
@@ -22,7 +23,7 @@ async function getAllTopicsFromDb() {
 
 
 /// <=============== controller Create Topics ===============>
-const CreateTopic = async (title, authorID) => {
+const CreateTopic = async (title, authorID, content) => {
 
 	//Si falta algun dato devolvemos un error
 	if (!title) throw new Error("Falta Title");
@@ -44,9 +45,9 @@ const CreateTopic = async (title, authorID) => {
 
 	await user.addTopic(topic);
 
+	const newPost = await createPost(content, authorID, topic.dataValues.ID)
 
-
-	return topic;
+	return { topic, newPost };
 }
 
 
