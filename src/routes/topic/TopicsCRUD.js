@@ -18,10 +18,10 @@ TopicRouter.get("/get-all-topics", authenticateToken, async (req, res) => {
 TopicRouter.post("/create-topic", async (req, res) => {
 	try {
 		const {
-			title, authorID
+			title, authorID, content
 		} = req.body;
 
-		const user = await CreateTopic(title, authorID);
+		const user = await CreateTopic(title, authorID, content);
 		res.status(200).send(user);
 	} catch (error) {
 		res.status(400).send(error.message);
