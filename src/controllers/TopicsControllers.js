@@ -12,9 +12,54 @@ const { createPost } = require('../controllers/PostControllers')
 const bcrypt = require('bcrypt');
 
 
-/// <=============== controller getAllRecipes ===============>
+/// <=============== controller getTopicById ===============>
+async function getTopicsById(id) {
+	if (!id) throw new Error("No se recibió un Topic en el payload");
+
+	const topic = await Topic.findByPk(id);
+	if (!topic) throw new Error("Topic not Found");
+	return topic;
+}
+
+/// <=============== controller getTopicByUserID ===============>
+async function getTopicsByUserId(userID) {
+	if (!userID) throw new Error("No se recibió un userID en el payload");
+
+	const topic = await Topic.findAll({ where: { authorID: userID } });
+	if (!topic) throw new Error("Topic not Found");
+	return topic;
+}
+
+/// <=============== controller getLastActiveTopics ===============>
+async function getLastActiveTopics() {
+	const ultimosPost = await Post.findAll({
+		attributes: ['ID', 'TopicID'],
+		order: [['updatedAt', 'DESC']],
+		group: ['TopicID', 'Post.ID'],
+		limit: 10,
+	});
+
+	if (!ultimosPost || ultimosPost.length === 0) {
+		throw new Error("Topics not found");
+	}
+
+	const lastActiveTopicsID = ultimosPost.map(item => item.TopicID);
+	const lastActiveTopics = [];
+
+	for (let i = 0; i < lastActiveTopicsID.length; i++) {
+		const element = lastActiveTopicsID[i];
+		const activeTopic = await Topic.findOne({ where: { ID: element } });
+		lastActiveTopics.push(activeTopic);
+	}
+
+	console.log(lastActiveTopics);
+	return { lastActiveTopics, ultimosPost };
+}
+
+
+/// <=============== controller getAllTopicsFromDb ===============>
 async function getAllTopicsFromDb() {
-	// Guardamos los datos de la API en data
+
 	const topics = await Topic.findAll();
 	//Si la funcion no recibe nada, devuelve un error.
 	if (!topics) throw new Error("No se encontraron Topics");
@@ -89,6 +134,9 @@ const deleteTopic = async (ID) => {
 module.exports = {
 	CreateTopic,
 	getAllTopicsFromDb,
+	getTopicsById,
+	getTopicsByUserId,
+	getLastActiveTopics,
 	updateTopic,
 	deleteTopic
 }
