@@ -25,7 +25,7 @@ const createPost = async (
   authorID,
   topicID
 ) => {
-  console.log(content, authorID, topicID);
+  // console.log(content, authorID, topicID);
   //Si falta algun dato devolvemos un error
   if (!content) throw new Error("Falta content");
   if (!authorID) throw new Error("Falta Author");
@@ -46,13 +46,18 @@ const createPost = async (
       topicID: topic.ID,
     },
   });
-  console.log("topicCreated: ", postCreated, post);
+  console.log("topicCreated: ", topic);
+
+  if (!post.author) throw new Error("El autor del post es nulo");
+  if (!authorID) throw new Error("El ID del autor es nulo");
+
   await topic.addPost(post);
   await topic.update({
     postCount: topic.postCount + 1,
-    lastAuthor: user.username,
-    lastAuthorID: user.ID
+    lastAuthor: post.author,
+    lastAuthorID: authorID
   });
+
   const newPost = {
     author: user.username,
     content: content,
