@@ -50,6 +50,8 @@ const createPost = async (
   await topic.addPost(post);
   await topic.update({
     postCount: topic.postCount + 1,
+    lastAuthor: user.username,
+    lastAuthorID: user.ID
   });
   const newPost = {
     author: user.username,

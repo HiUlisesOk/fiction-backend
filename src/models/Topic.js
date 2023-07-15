@@ -28,6 +28,14 @@ module.exports = (sequelize) => {
 				allowNull: true,
 				defaultValue: 1,
 			},
+			lastAuthor: {
+				type: DataTypes.STRING,
+				allowNull: false,
+			},
+			lastAuthorID: {
+				type: DataTypes.INTEGER,
+				allowNull: false,
+			},
 		},
 		{
 			paranoid: true,
