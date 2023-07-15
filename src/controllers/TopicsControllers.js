@@ -32,28 +32,14 @@ async function getTopicsByUserId(userID) {
 
 /// <=============== controller getLastActiveTopics ===============>
 async function getLastActiveTopics() {
-	const ultimosPost = await Post.findAll({
-		attributes: ['ID', 'TopicID'],
+	const lastActiveTopics = await Topic.findAll({
 		order: [['updatedAt', 'DESC']],
-		group: ['TopicID', 'Post.ID'],
+		group: ['ID'],
 		limit: 10,
 	});
 
-	if (!ultimosPost || ultimosPost.length === 0) {
-		throw new Error("Topics not found");
-	}
-
-	const lastActiveTopicsID = ultimosPost.map(item => item.TopicID);
-	const lastActiveTopics = [];
-
-	for (let i = 0; i < lastActiveTopicsID.length; i++) {
-		const element = lastActiveTopicsID[i];
-		const activeTopic = await Topic.findOne({ where: { ID: element } });
-		lastActiveTopics.push(activeTopic);
-	}
-
 	console.log(lastActiveTopics);
-	return { lastActiveTopics, ultimosPost };
+	return { lastActiveTopics };
 }
 
 

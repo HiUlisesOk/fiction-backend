@@ -23,7 +23,11 @@ module.exports = (sequelize) => {
 				type: DataTypes.INTEGER,
 				allowNull: false,
 			},
-
+			postCount: {
+				type: DataTypes.INTEGER,
+				allowNull: true,
+				defaultValue: 1,
+			},
 		},
 		{
 			paranoid: true,

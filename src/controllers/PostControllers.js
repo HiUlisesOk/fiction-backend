@@ -48,7 +48,9 @@ const createPost = async (
   });
   console.log("topicCreated: ", postCreated, post);
   await topic.addPost(post);
-
+  await topic.update({
+    postCount: topic.postCount + 1,
+  });
   const newPost = {
     author: user.username,
     content: content,
