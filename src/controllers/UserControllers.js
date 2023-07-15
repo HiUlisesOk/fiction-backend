@@ -33,8 +33,6 @@ async function getUserFromDb(userID) {
 	return matchingUser;
 }
 
-/// <=============== POST - CREAR USER CONTROLLER ===============>
-
 async function createUser(
 	username,
 	firstName,
@@ -45,8 +43,7 @@ async function createUser(
 	userScore,
 	profilePicture,
 ) {
-	//Si falta algun dato devolvemos un error
-	if (!username) throw new Error("Falta firstName");
+	if (!username) throw new Error("Falta username");
 	if (!email) throw new Error("Falta email");
 	if (!password) throw new Error("Falta password");
 
@@ -59,49 +56,44 @@ async function createUser(
 
 	if (matchingUser) throw new Error("El usuario ya existe");
 
-	// Obtener la contraseña del usuario (por ejemplo, desde req.body)
-	const userPassword = password;
+	try {
+		const hashedPassword = await bcrypt.hash(password, 10);
+		const [user, userCreated] = await User.findOrCreate({
+			where: {
+				username: username,
+				email: email,
+				password: hashedPassword,
+			},
+		});
 
-	// Generar el hash de la contraseña utilizando bcrypt
-	const hashedPassword = await bcrypt.hash(userPassword, 10); // El segundo argumento es el "cost factor", cuanto mayor, más seguro pero más lento
-	console.log(hashedPassword)
-	// Almacenar el hash de la contraseña en la base de datos
-	// Guardar hashedPassword en el campo correspondiente en la tabla de usuarios
+		if (!userCreated) throw new Error("El usuario ya existe en la base de datos");
 
+		const topic = await Topic.create({
+			title: 'Mi primer topic',
+			author: username,
+			authorID: user.ID
+			// Otros campos del topic
+		});
 
-	const [user, userCreated] = await User.findOrCreate({
-		where: {
-			username: username,
-			email: email,
-			password: hashedPassword,
-		},
-	});
-	console.log(userCreated)
-	// Crea un topic asociado al usuario
-	const topic = await Topic.create({
-		title: 'Mi primer topic',
-		author: username,
-		authorID: user.ID
-		// Otros campos del topic
-	});
+		const post = await Post.create({
+			title: 'Mi primer post',
+			content: 'Hola! 😎',
+			author: username,
+			authorID: user.ID,
+			topicID: topic.ID
+			// Otros campos del post
+		});
 
-	// Crea un post asociado al usuario
-	const post = await Post.create({
-		title: 'Mi primer post',
-		content: 'Hola! 😎',
-		author: username,
-		authorID: user.ID,
-		topicID: topic.ID
-		// Otros campos del post
-	});
+		await user.addPost(post);
+		await user.addTopic(topic);
+		await post.setTopic(topic);
 
-	await user.addPost(post);
-	await user.addTopic(topic);
-	await post.setTopic(topic);
-
-
-	return { message: `El usuario ${username} ha sido creado correctamente`, type: true };
+		return { message: `El usuario ${username} ha sido creado correctamente`, type: true };
+	} catch (error) {
+		throw new Error("Error al crear el usuario: " + error.message);
+	}
 }
+
 
 /// <=============== POST - UPDATE USER ===============>
 

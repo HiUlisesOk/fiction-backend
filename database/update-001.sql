@@ -9,4 +9,4 @@ WHERE "lastAuthor" IS NULL;
 
 -- Ahora puedes agregar la restricción NOT NULL a la columna "lastAuthor"
 ALTER TABLE public."Topics"
-ALTER COLUMN "lastAuthor" SET NOT NULL;
+ALTER COLUMN "lastAuthor" SET NOT NULL; 

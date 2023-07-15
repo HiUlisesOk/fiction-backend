@@ -30,11 +30,11 @@ module.exports = (sequelize) => {
 			},
 			lastAuthor: {
 				type: DataTypes.STRING,
-				allowNull: false,
+				allowNull: true,
 			},
 			lastAuthorID: {
 				type: DataTypes.INTEGER,
-				allowNull: false,
+				allowNull: true,
 			},
 		},
 		{
