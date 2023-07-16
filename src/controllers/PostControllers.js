@@ -31,7 +31,7 @@ async function getPostById(id) {
 
 /// <=============== controller getPostByTopicId ===============>
 async function getPostByTopicId(topicId) {
-  if (!id) throw new Error("No se recibió un Topic ID en el payload");
+  if (!topicId) throw new Error("No se recibió un Topic ID en el payload");
 
   const posts = await Post.findAll({ where: { TopicID: topicId } });
   if (!posts) throw new Error("Topic not Found");
