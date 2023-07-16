@@ -19,6 +19,34 @@ async function getAllPostFromDb() {
   return posts;
 }
 
+/// <=============== controller getPostById ===============>
+async function getPostById(id) {
+  if (!id) throw new Error("No se recibió un Post en el payload");
+
+  const post = await Post.findByPk(id);
+  if (!post) throw new Error("Post not Found");
+  return post;
+}
+
+
+/// <=============== controller getPostByTopicId ===============>
+async function getPostByTopicId(topicId) {
+  if (!id) throw new Error("No se recibió un Topic ID en el payload");
+
+  const posts = await Post.findAll({ where: { TopicID: topicId } });
+  if (!posts) throw new Error("Topic not Found");
+  return posts;
+}
+
+/// <=============== controller getPostByUserID ===============>
+async function getTopicsByUserId(userID) {
+  if (!userID) throw new Error("No se recibió un userID en el payload");
+
+  const posts = await Post.findAll({ where: { authorID: userID } });
+  if (!posts) throw new Error("Topic not Found");
+  return posts;
+}
+
 /// <=============== CREATE POST ===============>
 const createPost = async (
   content,
@@ -107,4 +135,4 @@ const deletePost = async (authorID) => {
   return post;
 };
 
-module.exports = { createPost, getAllPostFromDb, updatePost, deletePost };
+module.exports = { createPost, getAllPostFromDb, updatePost, deletePost, getTopicsByUserId, getPostByTopicId, getPostById };

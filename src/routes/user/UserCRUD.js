@@ -1,6 +1,13 @@
+/**
+ * @swagger
+ * tags:
+ *   - name: Users
+ *     description: Operaciones relacionadas con los usuarios
+ */
+
 const { Router } = require("express");
 const userRouter = Router();
-const { authenticateToken } = require('../../utils/Auth')
+const { authenticateToken } = require('../../utils/Auth');
 const {
 	getAllUsersFromDb,
 	createUser,
@@ -11,7 +18,22 @@ const {
 	getUserFromDb,
 } = require("../../controllers/UserControllers.js");
 
-
+/**
+ * @swagger
+ * /get-all-users:
+ *   get:
+ *     tags:
+ *       - Users
+ *     summary: Obtener todos los usuarios
+ *     description: Obtiene una lista de todos los usuarios
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: OK
+ *       401:
+ *         description: Error de autenticación
+ */
 userRouter.get("/get-all-users", authenticateToken, async (req, res) => {
 	try {
 		const userList = await getAllUsersFromDb();
@@ -21,6 +43,29 @@ userRouter.get("/get-all-users", authenticateToken, async (req, res) => {
 	}
 });
 
+/**
+ * @swagger
+ * /get-user-info/{id}:
+ *   get:
+ *     tags:
+ *       - Users
+ *     summary: Obtener información de un usuario por ID
+ *     description: Obtiene la información de un usuario específico por su ID
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         description: ID del usuario a obtener
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: OK
+ *       401:
+ *         description: Error de autenticación
+ */
 userRouter.get("/get-user-info/:id", authenticateToken, async (req, res) => {
 	try {
 		const userID = req.params.id;
@@ -31,8 +76,51 @@ userRouter.get("/get-user-info/:id", authenticateToken, async (req, res) => {
 	}
 });
 
-
-
+/**
+ * @swagger
+ * /create-user:
+ *   post:
+ *     tags:
+ *       - Users
+ *     summary: Crear un nuevo usuario
+ *     description: Crea un nuevo usuario con los datos proporcionados
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               firstName:
+ *                 type: string
+ *               lastName:
+ *                 type: string
+ *               birthDate:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               userScore:
+ *                 type: number
+ *               profilePicture:
+ *                 type: string
+ *               isAdmin:
+ *                 type: boolean
+ *             required:
+ *               - username
+ *               - firstName
+ *               - lastName
+ *               - birthDate
+ *               - email
+ *               - password
+ *     responses:
+ *       200:
+ *         description: OK
+ *       400:
+ *         description: Error de solicitud inválida
+ */
 userRouter.post("/create-user", async (req, res) => {
 	try {
 		const {
@@ -64,6 +152,41 @@ userRouter.post("/create-user", async (req, res) => {
 	}
 });
 
+/**
+ * @swagger
+ * /update-profilePicture:
+ *   put:
+ *     tags:
+ *       - Users
+ *     summary: Actualizar la imagen de perfil de un usuario
+ *     description: Actualiza la imagen de perfil de un usuario específico
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               imagen64:
+ *                 type: string
+ *               ID:
+ *                 type: string
+ *               username:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *             required:
+ *               - imagen64
+ *               - ID
+ *               - username
+ *               - email
+ *     responses:
+ *       200:
+ *         description: OK
+ *       400:
+ *         description: Error de solicitud inválida
+ */
 userRouter.put("/update-profilePicture", authenticateToken, async (req, res) => {
 	try {
 		const {
@@ -85,6 +208,53 @@ userRouter.put("/update-profilePicture", authenticateToken, async (req, res) => 
 	}
 });
 
+/**
+ * @swagger
+ * /update-user:
+ *   put:
+ *     tags:
+ *       - Users
+ *     summary: Actualizar un usuario existente
+ *     description: Actualiza los datos de un usuario existente
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               ID:
+ *                 type: string
+ *               username:
+ *                 type: string
+ *               firstName:
+ *                 type: string
+ *               lastName:
+ *                 type: string
+ *               birthDate:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               userScore:
+ *                 type: number
+ *               profilePicture:
+ *                 type: string
+ *             required:
+ *               - ID
+ *               - username
+ *               - firstName
+ *               - lastName
+ *               - birthDate
+ *               - email
+ *               - userScore
+ *               - profilePicture
+ *     responses:
+ *       200:
+ *         description: OK
+ *       400:
+ *         description: Error de solicitud inválida
+ */
 userRouter.put("/update-user", authenticateToken, async (req, res) => {
 	try {
 		const {
@@ -114,6 +284,29 @@ userRouter.put("/update-user", authenticateToken, async (req, res) => {
 	}
 });
 
+/**
+ * @swagger
+ * /delete-user:
+ *   delete:
+ *     tags:
+ *       - Users
+ *     summary: Eliminar un usuario existente
+ *     description: Elimina un usuario existente por su ID
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: ID
+ *         description: ID del usuario a eliminar
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: OK
+ *       400:
+ *         description: Error de solicitud inválida
+ */
 userRouter.delete("/delete-user", authenticateToken, async (req, res) => {
 	try {
 		const { ID } = req.query;

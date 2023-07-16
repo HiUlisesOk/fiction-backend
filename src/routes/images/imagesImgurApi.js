@@ -1,14 +1,35 @@
+/**
+ * @swagger
+ * tags:
+ *   - name: Images
+ *     description: Operaciones relacionadas con imágenes
+ */
+
 const { Router } = require("express");
 const imagesImgurAPI = Router();
-const { authenticateToken } = require('../../utils/Auth')
-const { generateAccessToken, uploadImage } = require('../../controllers/imagesControllers.js')
-const convertImageToBase64 = require('../../utils/convertImageToBase64')
+const { authenticateToken } = require('../../utils/Auth');
+const { generateAccessToken, uploadImage } = require('../../controllers/imagesControllers.js');
+const convertImageToBase64 = require('../../utils/convertImageToBase64');
 
-
+/**
+ * @swagger
+ * /get-imgur-image-token:
+ *   get:
+ *     tags:
+ *       - Images
+ *     summary: Obtener token de Imgur
+ *     description: Obtiene un token de acceso de Imgur para subir imágenes
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: OK
+ *       401:
+ *         description: Error de autenticación
+ */
 imagesImgurAPI.get("/get-imgur-image-token", authenticateToken, async (req, res) => {
 	try {
 		const token = await generateAccessToken();
-		console.log(token);
 		process.env.bearer_token = 'Bearer ' + token;
 		res.status(200).send(token);
 	} catch (error) {
@@ -16,12 +37,35 @@ imagesImgurAPI.get("/get-imgur-image-token", authenticateToken, async (req, res)
 	}
 });
 
+/**
+ * @swagger
+ * /upload-image:
+ *   post:
+ *     tags:
+ *       - Images
+ *     summary: Subir una imagen a Imgur
+ *     description: Sube una imagen en formato base64 a Imgur
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               imagen64:
+ *                 type: string
+ *             required:
+ *               - imagen64
+ *     responses:
+ *       200:
+ *         description: OK
+ *       400:
+ *         description: Error de solicitud inválida
+ */
 imagesImgurAPI.post("/upload-image", authenticateToken, async (req, res) => {
 	try {
-		const {
-			imagen64
-		} = req.body;
-
+		const { imagen64 } = req.body;
 		const imageUploaded = await uploadImage(imagen64);
 		res.status(200).send(imageUploaded);
 	} catch (error) {
@@ -29,34 +73,5 @@ imagesImgurAPI.post("/upload-image", authenticateToken, async (req, res) => {
 	}
 });
 
-// imagesImgurAPI.put("/update-post", async (req, res) => {
-// 	try {
-// 		const {
-// 			content, authorID, postID, topicID
-// 		} = req.body;
-
-// 		const Post = await updatePost(
-// 			content,
-// 			authorID,
-// 			postID,
-// 			topicID
-// 		);
-// 		res.status(200).send(Post ? true : false);
-// 	} catch (error) {
-// 		res.status(400).send(error.message);
-// 	}
-// });
-
-// imagesImgurAPI.delete("/delete-post", async (req, res) => {
-// 	try {
-// 		const { ID } = req.query;
-
-// 		const Post = await deletePost(ID);
-// 		res.status(200).send(Post ? true : false);
-// 	} catch (error) {
-// 		res.status(400).send(error.message);
-// 	}
-// });
-
-
 module.exports = imagesImgurAPI;
+
