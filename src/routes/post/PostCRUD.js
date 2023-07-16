@@ -77,7 +77,7 @@ postRouter.get("/get-post-byTopicId", authenticateToken, async (req, res) => {
 
 /**
  * @swagger
- * /api/posts/get-post-byId:
+ * /get-post-byId:
  *   get:
  *     tags:
  *       - User Post
@@ -110,7 +110,7 @@ postRouter.get("/get-post-byId", authenticateToken, async (req, res) => {
 
 /**
  * @swagger
- * /posts/get-post-byUserId:
+ * /get-post-byUserId:
  *   get:
  *     tags:
  *       - User Post
@@ -143,7 +143,7 @@ postRouter.get("/get-post-byUserId", authenticateToken, async (req, res) => {
 
 /**
  * @swagger
- * /posts/create-post:
+ * /create-post:
  *   post:
  *     tags:
  *       - User Post
@@ -185,7 +185,7 @@ postRouter.post("/create-post", authenticateToken, async (req, res) => {
 
 /**
  * @swagger
- * /posts/update-post:
+ * /update-post:
  *   put:
  *     tags:
  *       - User Post
@@ -230,7 +230,7 @@ postRouter.put("/update-post", authenticateToken, async (req, res) => {
 
 /**
  * @swagger
- * /api/posts/delete-post:
+ * /delete-post:
  *   delete:
  *     tags:
  *       - User Post
