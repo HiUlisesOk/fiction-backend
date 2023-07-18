@@ -168,7 +168,7 @@ const AuthLogin = async (email, password) => {
 		// Consulta una base de datos para verificar las credenciales
 
 		const user = await User.findOne({
-			where: { email }
+			[Op.or]: [{ email: email }, { username: email }]
 		});
 
 		if (!user) {
