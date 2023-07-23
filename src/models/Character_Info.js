@@ -12,11 +12,11 @@ module.exports = (sequelize) => {
 				autoIncrement: true
 			},
 			realAge: {
-				type: DataTypes.STRING,
+				type: DataTypes.INTEGER,
 				allowNull: true,
 			},
 			fisicalAge: {
-				type: DataTypes.STRING,
+				type: DataTypes.INTEGER,
 				allowNull: true,
 			},
 			sexOrientation: {

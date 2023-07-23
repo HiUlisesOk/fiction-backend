@@ -88,31 +88,23 @@ characterRouter.get("/get-character-info/:id", authenticateToken, async (req, re
  *           schema:
  *             type: object
  *             properties:
- *               charactername:
+ *               userID:
+ *                 type: integer
+ *               name:
  *                 type: string
- *               firstName:
+ *               avatar:
  *                 type: string
- *               lastName:
+ *               charge:
  *                 type: string
- *               birthDate:
+ *               rank:
  *                 type: string
- *               email:
- *                 type: string
- *               password:
- *                 type: string
- *               characterScore:
- *                 type: number
- *               profilePicture:
- *                 type: string
- *               isAdmin:
- *                 type: boolean
+ *              
  *             required:
- *               - charactername
- *               - firstName
- *               - lastName
- *               - birthDate
- *               - email
- *               - password
+ *               - userID
+ *               - name
+ *               - avatar
+ *               - charge
+ *               - rank
  *     responses:
  *       200:
  *         description: OK
