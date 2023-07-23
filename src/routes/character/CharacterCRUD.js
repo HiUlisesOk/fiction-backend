@@ -122,6 +122,7 @@ characterRouter.get("/get-character-info/:id", authenticateToken, async (req, re
 characterRouter.post("/create-character", async (req, res) => {
 	try {
 		const {
+			userID,
 			name,
 			avatar,
 			charge,
@@ -129,6 +130,7 @@ characterRouter.post("/create-character", async (req, res) => {
 		} = req.body;
 
 		const character = await createCharacter(
+			userID,
 			name,
 			avatar,
 			charge,

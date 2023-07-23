@@ -6,7 +6,7 @@
 //         \|  
 
 const { Op } = require("sequelize");
-const { User, Post, Topic, Character } = require("../db");
+const { User, Post, Topic, Character, CharacterStats } = require("../db");
 const { generateDateOnly, generateDateTime } = require('../utils/date')
 const bcrypt = require('bcrypt');
 const { uploadImage } = require('./imagesControllers')
@@ -31,6 +31,7 @@ async function getCharacterById(ID) {
 
 /// <=============== controller createCharacter ===============>
 async function createCharacter(
+	userID,
 	name,
 	avatar,
 	charge,
@@ -58,7 +59,38 @@ async function createCharacter(
 
 		if (!characterCreated) throw new Error("El personaje no pudo ser creado.");
 
-		return { message: `El personaje ${name} ha sido creado correctamente`, type: true };
+
+		const stats = await CharacterStats.create({
+			level: 0,
+			diceName: "default",
+			diceID: null,
+			diceValue: 5,
+			EXP: 1,
+			HP: 100,
+			STR: 1,
+			AGI: 1,
+			INT: 1,
+			RES: 1,
+			CHARM: 1,
+			WIS: 1,
+		});
+
+		if (!stats) throw new Error("No se pudieron añadir stats a este personaje.");
+
+		const matchingUser = await User.findOne({
+			where: {
+				[Op.or]: [{ ID: userID }],
+			},
+		});
+
+		if (!matchingUser) throw new Error("El userID no es válido o no existe.");
+
+		await matchingUser.addCharacter(character);
+		await stats.setCharacter(character);
+		// await character.setStats(stats);
+
+
+		return { message: `El personaje ${name} ha sido creado correctamente`, type: true, character: character, stats: stats };
 	} catch (error) {
 		throw new Error("Error al crear el usuario: " + error.message);
 	}
