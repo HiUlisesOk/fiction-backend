@@ -3,42 +3,44 @@ const { DataTypes } = require("sequelize");
 // Luego le injectamos la conexion a sequelize.
 module.exports = (sequelize) => {
 	// defino el modelo
-	sequelize.define(
-		"Character",
+	const Topic = sequelize.define(
+		"Topic",
 		{
 			ID: {
 				type: DataTypes.INTEGER,
 				primaryKey: true,
 				autoIncrement: true
 			},
-			name: {
+			title: {
+				type: DataTypes.STRING,
+				allowNull: false,
+			},
+			author: {
+				type: DataTypes.STRING,
+				allowNull: false,
+			},
+			authorID: {
+				type: DataTypes.INTEGER,
+				allowNull: false,
+			},
+			postCount: {
+				type: DataTypes.INTEGER,
+				allowNull: true,
+				defaultValue: 1,
+			},
+			lastAuthor: {
 				type: DataTypes.STRING,
 				allowNull: true,
 			},
-			guildName: {
-				type: DataTypes.STRING,
-				allowNull: true,
-			},
-			guildID: {
+			lastAuthorID: {
 				type: DataTypes.INTEGER,
 				allowNull: true,
 			},
-			avatar: {
-				type: DataTypes.STRING,
-				allowNull: true,
-				defaultValue: "https://via.placeholder.com/500x500",
-			},
-			charge: {
-				type: DataTypes.STRING,
-				allowNull: true,
-			},
-			rank: {
-				type: DataTypes.STRING,
-				allowNull: true,
-			}
 		},
 		{
 			paranoid: true,
 		},
 	);
+
+	return Topic;
 };

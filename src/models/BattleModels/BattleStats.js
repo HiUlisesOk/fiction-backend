@@ -4,10 +4,20 @@ const { DataTypes } = require("sequelize");
 module.exports = (sequelize) => {
 	// defino el modelo
 	sequelize.define(
-		"CharacterStats",
+		"BattleStats",
 		{
 			ID: {
 				type: DataTypes.INTEGER,
+				primaryKey: true,
+				autoIncrement: true
+			},
+			charID: {
+				type: DataTypes.INTEGER,
+				primaryKey: true,
+				autoIncrement: true
+			},
+			charName: {
+				type: DataTypes.STRING,
 				primaryKey: true,
 				autoIncrement: true
 			},

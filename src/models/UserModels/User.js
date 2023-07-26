@@ -3,7 +3,7 @@ const { DataTypes } = require("sequelize");
 // Luego le injectamos la conexion a sequelize.
 module.exports = (sequelize) => {
 	// defino el modelo
-	sequelize.define(
+	const User = sequelize.define(
 		"User",
 		{
 			ID: {
@@ -56,4 +56,5 @@ module.exports = (sequelize) => {
 			paranoid: true,
 		},
 	);
+	return User;
 };

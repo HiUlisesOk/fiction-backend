@@ -4,35 +4,30 @@ const { DataTypes } = require("sequelize");
 module.exports = (sequelize) => {
 	// defino el modelo
 	sequelize.define(
-		"Topic",
+		"Battle",
 		{
 			ID: {
 				type: DataTypes.INTEGER,
 				primaryKey: true,
 				autoIncrement: true
 			},
-			title: {
-				type: DataTypes.STRING,
-				allowNull: false,
+			roundID: {
+				type: DataTypes.INTEGER,
+				allowNull: true,
 			},
-			author: {
-				type: DataTypes.STRING,
-				allowNull: false,
+			battleStatsID: {
+				type: DataTypes.INTEGER,
+				allowNull: true,
 			},
-			authorID: {
+			roundsCount: {
 				type: DataTypes.INTEGER,
 				allowNull: false,
 			},
-			postCount: {
-				type: DataTypes.INTEGER,
-				allowNull: true,
-				defaultValue: 1,
+			Characters: {
+				type: DataTypes.ARRAY,
+				allowNull: false,
 			},
-			lastAuthor: {
-				type: DataTypes.STRING,
-				allowNull: true,
-			},
-			lastAuthorID: {
+			WinnerID: {
 				type: DataTypes.INTEGER,
 				allowNull: true,
 			},

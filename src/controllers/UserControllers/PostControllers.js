@@ -6,8 +6,8 @@
 //         \|
 
 const { Op } = require("sequelize");
-const { User, Post, Topic } = require("../db");
-const { generateDateOnly, generateDateTime } = require("../utils/date");
+const { User, Post, Topic } = require("../../db");
+const { generateDateOnly, generateDateTime } = require("../../utils/date");
 const bcrypt = require("bcrypt");
 
 /// <=============== GET ALL POST ===============>

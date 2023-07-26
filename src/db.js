@@ -1,73 +1,86 @@
-require("dotenv").config();
-const { Sequelize } = require("sequelize");
-const fs = require("fs");
-const path = require("path");
+const { Sequelize, DataTypes } = require("sequelize");
 const { DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME } = process.env;
 
 const sequelize = new Sequelize(
   `postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}`,
   {
-    logging: false, // set to console.log to see the raw SQL queries
-    native: false, // lets Sequelize know we can use pg-native for ~30% more speed
-  },
+    logging: false,
+    native: false,
+  }
 );
-const basename = path.basename(__filename);
 
-const modelDefiners = [];
+// Aquí importamos los modelos y los definimos en la conexión sequelize
 
-// Leemos todos los archivos de la carpeta Models, los requerimos y agregamos al arreglo modelDefiners
-fs.readdirSync(path.join(__dirname, "/models"))
-  .filter(
-    (file) =>
-      file.indexOf(".") !== 0 && file !== basename && file.slice(-3) === ".js",
-  )
-  .forEach((file) => {
-    modelDefiners.push(require(path.join(__dirname, "/models", file)));
-  });
+const User = require("./models/UserModels/User")(sequelize);
+const Topic = require("./models/UserModels/Topic")(sequelize);
+const Post = require("./models/UserModels/Post")(sequelize);
+const Character = require("./models/CharacterModels/Character")(sequelize);
+const CharacterStats = require("./models/CharacterModels/CharacterStats")(sequelize);
+const Character_Info = require("./models/CharacterModels/Character_Info")(sequelize);
+const Character_skills = require("./models/CharacterModels/Character_skills")(sequelize);
+const Battle = require('./models/BattleModels/Battle')(sequelize);
+const BattleRounds = require('./models/BattleModels/BattleRounds')(sequelize);
+const BattleStats = require('./models/BattleModels/BattleStats')(sequelize);
+const BattleTurn = require('./models/BattleModels/BattleTurn')(sequelize);
 
-// Injectamos la conexion (sequelize) a todos los modelos
-modelDefiners.forEach((model) => model(sequelize));
-// Capitalizamos los nombres de los modelos ie: product => Product
-let entries = Object.entries(sequelize.models);
-let capsEntries = entries.map((entry) => [
-  entry[0][0].toUpperCase() + entry[0].slice(1),
-  entry[1],
-]);
-sequelize.models = Object.fromEntries(capsEntries);
 
-// En sequelize.models están todos los modelos importados como propiedades
-// Para relacionarlos hacemos un destructuring
-const { User, Topic, Post, Character, CharacterStats, Character_Info, Character_skills } = sequelize.models;
-
-// Aca vendrian las relaciones
-// Product.hasMany(Reviews);
-
-// Users
-User.belongsToMany(Topic, { through: 'UserTopics' });
+// Definimos las relaciones entre los modelos
+User.belongsToMany(Topic, { through: "UserTopics" });
 User.hasMany(Post);
 User.hasMany(Character);
 
-
-// Topic
-Topic.belongsToMany(User, { through: 'UserTopics' });
+Topic.belongsToMany(User, { through: "UserTopics" });
 Topic.hasMany(Post);
 
-// Post
 Post.belongsTo(User);
 Post.belongsTo(Topic);
 
-// Character
 Character.belongsTo(User);
+Character.hasMany(Battle);
+Character.hasMany(BattleStats);
 Character.hasOne(CharacterStats);
-Character.hasOne(Character_Info)
-Character.hasOne(Character_skills)
-//CharacterStats
+Character.hasOne(Character_Info);
+Character.hasOne(Character_skills);
+
 CharacterStats.belongsTo(Character);
+
 Character_Info.belongsTo(Character);
+
 Character_skills.belongsTo(Character);
 
+Battle.belongsToMany(Character, { through: "CharBattle" });
+Battle.hasMany(BattleStats);
+Battle.hasMany(BattleRounds);
+Battle.hasMany(BattleTurn);
 
+BattleStats.hasOne(Battle);
+BattleStats.hasOne(Character);
+BattleStats.hasMany(BattleRounds);
+BattleStats.hasMany(BattleTurn);
+
+BattleRounds.hasOne(Battle);
+BattleRounds.hasMany(BattleTurn);
+BattleRounds.hasMany(BattleStats);
+
+BattleTurn.hasOne(Battle);
+BattleTurn.hasOne(BattleRounds);
+BattleTurn.hasOne(BattleStats);
+BattleTurn.hasOne(Character);
+
+
+
+// Exportamos los modelos y la conexión
 module.exports = {
-  ...sequelize.models, // para poder importar los modelos así: const { Product, User } = require('./db.js');
-  conn: sequelize, // para importart la conexión { conn } = require('./db.js');
+  User,
+  Topic,
+  Post,
+  Character,
+  CharacterStats,
+  Character_Info,
+  Character_skills,
+  BattleStats,
+  Battle,
+  BattleRounds,
+  BattleTurn,
+  conn: sequelize,
 };

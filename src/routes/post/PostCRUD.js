@@ -15,7 +15,7 @@ const {
 	getTopicsByUserId,
 	getPostByTopicId,
 	getPostById
-} = require("../../controllers/PostControllers");
+} = require("../../controllers/UserControllers/PostControllers");
 
 /**
  * @swagger

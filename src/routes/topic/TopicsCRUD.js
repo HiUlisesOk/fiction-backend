@@ -16,7 +16,7 @@ const {
 	getLastActiveTopics,
 	updateTopic,
 	deleteTopic
-} = require("../../controllers/TopicsControllers");
+} = require("../../controllers/UserControllers/TopicsControllers");
 
 /**
  * @swagger
