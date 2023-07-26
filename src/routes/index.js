@@ -7,6 +7,8 @@ const userRouter = require("./user/UserCRUD");
 const postRouter = require('./post/PostCRUD')
 const TopicRouter = require('./topic/TopicsCRUD')
 const imagesImgurAPI = require('./images/imagesImgurApi')
+const characterRouter = require('./character/CharacterCRUD')
+const sheetRouter = require('./character/SheetsCRUD')
 // Configurar los routers
 // Ejemplo: router.use('/auth', authRouter);
 
@@ -18,7 +20,9 @@ router.use(postRouter);
 
 router.use(imagesImgurAPI);
 
+router.use(characterRouter);
 
+router.use(sheetRouter)
 
 module.exports = router;
 

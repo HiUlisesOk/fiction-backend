@@ -33,6 +33,8 @@ const swaggerOptions = {
 		"./src/routes/topic/TopicsCRUD.js",
 		"./src/routes/post/PostCRUD.js",
 		"./src/routes/images/imagesImgurApi.js",
+		"./src/routes/character/CharacterCRUD.js",
+		"./src/routes/character/SheetsCRUD.js",
 		"./src/routes/index.js",
 	],
 };
