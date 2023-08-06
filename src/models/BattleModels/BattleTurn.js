@@ -3,78 +3,59 @@ const { DataTypes } = require("sequelize");
 // Luego le injectamos la conexion a sequelize.
 module.exports = (sequelize) => {
 	// defino el modelo
-	sequelize.define(
-		"CharacterStats",
+	const BattleTurn = sequelize.define(
+		"BattleTurn",
 		{
 			ID: {
 				type: DataTypes.INTEGER,
 				primaryKey: true,
 				autoIncrement: true
 			},
-			level: {
+
+			CharID: {
+				type: DataTypes.INTEGER,
+				allowNull: false,
+			},
+			objectiveID: {
+				type: DataTypes.ARRAY(DataTypes.INTEGER),
+				allowNull: true,
+			},
+			TurnResolved: {
+				type: DataTypes.BOOLEAN,
+				allowNull: true,
+			},
+			TurnNumber: {
+				type: DataTypes.INTEGER,
+				allowNull: false,
+			},
+			previusHP: {
+				type: DataTypes.INTEGER,
+				allowNull: false,
+			},
+			currentHP: {
+				type: DataTypes.INTEGER,
+				allowNull: false,
+			},
+			atk: {
 				type: DataTypes.INTEGER,
 				allowNull: true,
 			},
-			diceName: {
-				type: DataTypes.STRING,
-				allowNull: true,
-			},
-			diceID: {
+			def: {
 				type: DataTypes.INTEGER,
 				allowNull: true,
 			},
-			diceName: {
-				type: DataTypes.STRING,
-				allowNull: true,
-			},
-			diceValue: {
+			heal: {
 				type: DataTypes.INTEGER,
 				allowNull: true,
-				defaultValue: 0,
 			},
-			EXP: {
+			ilu: {
 				type: DataTypes.INTEGER,
-				allowNull: true,
-				defaultValue: 0,
+				allowNull: false,
 			},
-			HP: {
-				type: DataTypes.INTEGER,
-				allowNull: true,
-				defaultValue: 0,
-			},
-			STR: {
-				type: DataTypes.INTEGER,
-				allowNull: true,
-				defaultValue: 0,
-			},
-			AGI: {
-				type: DataTypes.INTEGER,
-				allowNull: true,
-				defaultValue: 0,
-			},
-			INT: {
-				type: DataTypes.INTEGER,
-				allowNull: true,
-				defaultValue: 0,
-			},
-			RES: {
-				type: DataTypes.INTEGER,
-				allowNull: true,
-				defaultValue: 0,
-			},
-			CHARM: {
-				type: DataTypes.INTEGER,
-				allowNull: true,
-				defaultValue: 0,
-			},
-			WIS: {
-				type: DataTypes.INTEGER,
-				allowNull: true,
-				defaultValue: 0,
-			}
 		},
 		{
 			paranoid: true,
 		},
 	);
+	return BattleTurn
 };

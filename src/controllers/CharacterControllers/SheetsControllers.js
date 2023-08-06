@@ -6,10 +6,10 @@
 //         \|  
 
 const { Op } = require("sequelize");
-const { User, Post, Topic, Character, CharacterStats, Character_Info } = require("../db");
-const { generateDateOnly, generateDateTime } = require('../utils/date')
+const { User, Post, Topic, Character, CharacterStats, Character_Info } = require("../../db");
+const { generateDateOnly, generateDateTime } = require('../../utils/date')
 const bcrypt = require('bcrypt');
-const { uploadImage } = require('./imagesControllers')
+const { uploadImage } = require('../imagesControllers')
 
 
 /// <=============== controller getAllCharacters ===============>

@@ -6,10 +6,10 @@
 //         \|  
 
 const { Op } = require("sequelize");
-const { User, Post, Topic, Character, CharacterStats } = require("../db");
-const { generateDateOnly, generateDateTime } = require('../utils/date')
+const { User, Post, Topic, Character, CharacterStats } = require("../../db");
+const { generateDateOnly, generateDateTime } = require('../../utils/date')
 const bcrypt = require('bcrypt');
-const { uploadImage } = require('./imagesControllers')
+const { uploadImage } = require('../imagesControllers')
 
 
 /// <=============== controller getAllCharacters ===============>
@@ -63,7 +63,7 @@ async function createCharacter(
 		const stats = await CharacterStats.create({
 			level: 0,
 			diceName: "default",
-			diceID: null,
+			diceID: 1,
 			diceValue: 5,
 			EXP: 1,
 			HP: 100,

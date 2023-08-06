@@ -14,7 +14,7 @@ const {
 	createCharacter,
 	updateCharacter,
 	deletecharacter,
-} = require("../../controllers/CharacterControllers");
+} = require("../../controllers/CharacterControllers/CharacterControllers");
 
 /**
  * @swagger

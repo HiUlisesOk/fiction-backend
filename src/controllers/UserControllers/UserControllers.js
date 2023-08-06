@@ -6,10 +6,10 @@
 //         \|  
 
 const { Op } = require("sequelize");
-const { User, Post, Topic } = require("../db");
-const { generateDateOnly, generateDateTime } = require('../utils/date')
+const { User, Post, Topic } = require("../../db");
+const { generateDateOnly, generateDateTime } = require('../../utils/date')
 const bcrypt = require('bcrypt');
-const { uploadImage } = require('../controllers/imagesControllers')
+const { uploadImage } = require('../imagesControllers')
 
 
 /// <=============== controller getAllUsers ===============>
@@ -179,7 +179,10 @@ const AuthLogin = async (email, password) => {
 		console.log('User found:', user.email);
 
 		const passwordsMatch = await bcrypt.compare(password, user.password);
-
+		if (!passwordsMatch) {
+			console.log('Las contraseñas no coinciden', email);
+			throw new Error("Password not found");
+		}
 		console.log('Email:', user.email);
 		console.log('Password from login:', password);
 		console.log('Password from DB:', user.password);

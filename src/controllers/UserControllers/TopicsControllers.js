@@ -6,9 +6,9 @@
 //         \|  
 
 const { Op } = require("sequelize");
-const { User, Post, Topic } = require("../db");
-const { generateDateOnly, generateDateTime } = require('../utils/date')
-const { createPost } = require('../controllers/PostControllers')
+const { User, Post, Topic } = require("../../db");
+const { generateDateOnly, generateDateTime } = require('../../utils/date')
+const { createPost } = require('./PostControllers')
 const bcrypt = require('bcrypt');
 
 

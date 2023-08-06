@@ -16,7 +16,7 @@ const {
 	deleteUser,
 	uploadProfilePicture,
 	getUserFromDb,
-} = require("../../controllers/UserControllers.js");
+} = require("../../controllers/UserControllers/UserControllers");
 
 /**
  * @swagger

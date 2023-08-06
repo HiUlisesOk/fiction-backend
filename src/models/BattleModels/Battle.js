@@ -3,34 +3,30 @@ const { DataTypes } = require("sequelize");
 // Luego le injectamos la conexion a sequelize.
 module.exports = (sequelize) => {
 	// defino el modelo
-	sequelize.define(
-		"Post",
+	const Battle = sequelize.define(
+		"Battle",
 		{
 			ID: {
 				type: DataTypes.INTEGER,
 				primaryKey: true,
 				autoIncrement: true
 			},
-			content: {
-				type: DataTypes.TEXT,
+			Chars: {
+				type: DataTypes.ARRAY(DataTypes.INTEGER),
 				allowNull: false,
 			},
-			author: {
-				type: DataTypes.STRING,
-				allowNull: false,
-			},
-			authorID: {
+			WinnerID: {
 				type: DataTypes.INTEGER,
-				allowNull: false,
+				allowNull: true,
 			},
-			topicID: {
+			LoserID: {
 				type: DataTypes.INTEGER,
-				allowNull: false,
+				allowNull: true,
 			},
-
 		},
 		{
 			paranoid: true,
 		},
 	);
+	return Battle
 };

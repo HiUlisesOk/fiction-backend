@@ -10,7 +10,7 @@ const sheetRouter = Router();
 const { authenticateToken } = require('../../utils/Auth');
 const {
 	getAllSheets, getSheetsById, createSheets, updateSheet, deleteSheet
-} = require("../../controllers/SheetsControllers");
+} = require("../../controllers/CharacterControllers/SheetsControllers");
 
 /**
  * @swagger
@@ -181,7 +181,7 @@ sheetRouter.post("/create-sheet", async (req, res) => {
  *             type: object
  *             properties:
  *               ID:
- *                 type: string
+ *                 type: number
  *               realAge:
  *                 type: number
  *               fisicalAge:
