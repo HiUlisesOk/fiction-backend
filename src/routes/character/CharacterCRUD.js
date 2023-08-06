@@ -136,6 +136,9 @@ characterRouter.post("/create-character", async (req, res) => {
 
 /**
  * @swagger
+ * tags:
+ *   - name: characters
+ *     description: Endpoints related to character management
  * /update-character:
  *   put:
  *     tags:
@@ -145,42 +148,50 @@ characterRouter.post("/create-character", async (req, res) => {
  *     security:
  *       - bearerAuth: []
  *     requestBody:
+ *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
  *             properties:
  *               ID:
+ *                 type: integer
+ *               name:
  *                 type: string
- *               charactername:
+ *               avatar:
  *                 type: string
- *               firstName:
+ *               charge:
  *                 type: string
- *               lastName:
+ *               rank:
  *                 type: string
- *               birthDate:
+ *               guildName:
  *                 type: string
- *               email:
- *                 type: string
- *               characterScore:
- *                 type: number
- *               profilePicture:
- *                 type: string
- *             required:
- *               - ID
- *               - charactername
- *               - firstName
- *               - lastName
- *               - birthDate
- *               - email
- *               - characterScore
- *               - profilePicture
+ *               guildID:
+ *                 type: integer
+ *             example:
+ *               ID: "1"
+ *               name: "string"
+ *               avatar: "string"
+ *               charge: "string"
+ *               rank: "string"
+ *               guildName: "string"
+ *               guildID: 1
  *     responses:
  *       200:
- *         description: OK
+ *         description: Successful update
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 character:
+ *                   $ref: '#/components/schemas/Character'
  *       400:
- *         description: Error de solicitud inválida
+ *         description: Invalid request error
  */
+
 characterRouter.put("/update-character", authenticateToken, async (req, res) => {
 	try {
 		const {
