@@ -3,7 +3,7 @@ const { DataTypes } = require("sequelize");
 // Luego le injectamos la conexion a sequelize.
 module.exports = (sequelize) => {
 	// defino el modelo
-	sequelize.define(
+	const BattleTurn = sequelize.define(
 		"BattleTurn",
 		{
 			ID: {
@@ -11,37 +11,42 @@ module.exports = (sequelize) => {
 				primaryKey: true,
 				autoIncrement: true
 			},
-			battleID: {
-				type: DataTypes.INTEGER,
-				allowNull: true,
-			},
-			battleRound: {
-				type: DataTypes.INTEGER,
-				allowNull: true,
-			},
+
 			CharID: {
-				type: DataTypes.ARRAY,
+				type: DataTypes.INTEGER,
 				allowNull: false,
 			},
-			turnNumber: {
+			objectiveID: {
+				type: DataTypes.ARRAY(DataTypes.INTEGER),
+				allowNull: true,
+			},
+			TurnResolved: {
+				type: DataTypes.BOOLEAN,
+				allowNull: true,
+			},
+			TurnNumber: {
+				type: DataTypes.INTEGER,
+				allowNull: false,
+			},
+			previusHP: {
+				type: DataTypes.INTEGER,
+				allowNull: false,
+			},
+			currentHP: {
 				type: DataTypes.INTEGER,
 				allowNull: false,
 			},
 			atk: {
 				type: DataTypes.INTEGER,
-				allowNull: false,
-			},
-			atk: {
-				type: DataTypes.INTEGER,
-				allowNull: false,
+				allowNull: true,
 			},
 			def: {
 				type: DataTypes.INTEGER,
-				allowNull: false,
+				allowNull: true,
 			},
 			heal: {
 				type: DataTypes.INTEGER,
-				allowNull: false,
+				allowNull: true,
 			},
 			ilu: {
 				type: DataTypes.INTEGER,
@@ -52,4 +57,5 @@ module.exports = (sequelize) => {
 			paranoid: true,
 		},
 	);
+	return BattleTurn
 };

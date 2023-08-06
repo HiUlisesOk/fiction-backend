@@ -3,7 +3,7 @@ const { DataTypes } = require("sequelize");
 // Luego le injectamos la conexion a sequelize.
 module.exports = (sequelize) => {
 	// defino el modelo
-	sequelize.define(
+	const BattleStats = sequelize.define(
 		"BattleStats",
 		{
 			ID: {
@@ -13,13 +13,13 @@ module.exports = (sequelize) => {
 			},
 			charID: {
 				type: DataTypes.INTEGER,
-				primaryKey: true,
-				autoIncrement: true
+
+				allowNull: true,
 			},
 			charName: {
 				type: DataTypes.STRING,
-				primaryKey: true,
-				autoIncrement: true
+
+				allowNull: true,
 			},
 			level: {
 				type: DataTypes.INTEGER,
@@ -87,4 +87,5 @@ module.exports = (sequelize) => {
 			paranoid: true,
 		},
 	);
+	return BattleStats
 };

@@ -37,6 +37,7 @@ const swaggerOptions = {
 		"./src/routes/character/SheetsCRUD.js",
 		"./src/routes/character/SkillsCRUD.js",
 		"./src/routes/character/StatsCRUD.js",
+		"./src/routes/battle/battleEndpoints.js",
 		"./src/routes/index.js",
 	],
 };

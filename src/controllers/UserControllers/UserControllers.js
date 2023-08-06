@@ -179,7 +179,10 @@ const AuthLogin = async (email, password) => {
 		console.log('User found:', user.email);
 
 		const passwordsMatch = await bcrypt.compare(password, user.password);
-
+		if (!passwordsMatch) {
+			console.log('Las contraseñas no coinciden', email);
+			throw new Error("Password not found");
+		}
 		console.log('Email:', user.email);
 		console.log('Password from login:', password);
 		console.log('Password from DB:', user.password);

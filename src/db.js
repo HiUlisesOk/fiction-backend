@@ -35,17 +35,18 @@ Topic.hasMany(Post);
 Post.belongsTo(User);
 Post.belongsTo(Topic);
 
+// ...
+
 Character.belongsTo(User);
-Character.hasMany(Battle);
+Character.belongsToMany(Battle, { through: "CharBattle" });
 Character.hasMany(BattleStats);
 Character.hasOne(CharacterStats);
 Character.hasOne(Character_Info);
 Character.hasOne(Character_skills);
 
+
 CharacterStats.belongsTo(Character);
-
 Character_Info.belongsTo(Character);
-
 Character_skills.belongsTo(Character);
 
 Battle.belongsToMany(Character, { through: "CharBattle" });
@@ -53,19 +54,23 @@ Battle.hasMany(BattleStats);
 Battle.hasMany(BattleRounds);
 Battle.hasMany(BattleTurn);
 
-BattleStats.hasOne(Battle);
-BattleStats.hasOne(Character);
+BattleStats.belongsTo(Battle);
+BattleStats.belongsTo(Character);
 BattleStats.hasMany(BattleRounds);
 BattleStats.hasMany(BattleTurn);
 
+
 BattleRounds.hasOne(Battle);
 BattleRounds.hasMany(BattleTurn);
+BattleRounds.hasOne(Character);
 BattleRounds.hasMany(BattleStats);
 
-BattleTurn.hasOne(Battle);
-BattleTurn.hasOne(BattleRounds);
-BattleTurn.hasOne(BattleStats);
-BattleTurn.hasOne(Character);
+BattleTurn.belongsTo(Battle);
+BattleTurn.belongsTo(BattleRounds);
+BattleTurn.belongsTo(Character);
+BattleTurn.belongsTo(BattleStats);
+
+// ...
 
 
 
