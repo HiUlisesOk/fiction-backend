@@ -383,6 +383,9 @@ async function takeTurn(CharID, BattleID, actionType, actionType2, objectiveID, 
   };
 }
 
+async function getAllBattles() {
+  const allBattles = await Battle.findAll();
+}
 
 module.exports = {
   startBattle,
