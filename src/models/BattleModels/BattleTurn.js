@@ -52,6 +52,10 @@ module.exports = (sequelize) => {
 				type: DataTypes.INTEGER,
 				allowNull: false,
 			},
+			counter: {
+				type: DataTypes.INTEGER,
+				allowNull: true,
+			},
 		},
 		{
 			paranoid: true,

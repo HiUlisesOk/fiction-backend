@@ -254,29 +254,27 @@ async function takeTurn(CharID, BattleID, actionType, actionType2, objectiveID, 
 
   switch (Number(actionType2)) {
     case battleActions.ATK:
-      turnAction2 = actionType2 ? { ...turnAction2, atk: battleStats.AGI + rollDice(battleStats.diceValue) + battleStats.STR } : turnAction2;
-      // console.log('actionType: ', actionType, battleActions, turnAction2)
+      turnAction2 = { ...turnAction2, atk: battleStats.AGI * rollDice(battleStats.diceValue) + battleStats.STR };
+      // console.log('actionType2: ', actionType2, battleActions, turnAction2)
       break;
     case battleActions.DEF:
-      if (opponentTurn?.atk === null || opponentTurn?.atk === undefined || opponentTurn?.atk === false || !opponentTurn?.atk) { turnAction2 = turnAction2 = actionType2 ? { ...turnAction2, def: 0 } : turnAction2 }
+      if (opponentTurn?.atk === null || opponentTurn?.atk === undefined || opponentTurn?.atk === false || !opponentTurn?.atk) { turnAction2 = { ...turnAction2, def: 0 } }
       else {
-        turnAction2 = actionType2 ? { ...turnAction2, def: battleStats.DEF + rollDice(battleStats.diceValue) } : turnAction2
+        turnAction2 = { ...turnAction2, def: battleStats.RES + rollDice(battleStats.diceValue) }
       }
-      // console.log('actionType: ', actionType, battleActions, turnAction2)
+
       break;
     case battleActions.HEAL:
-      turnAction2 = actionType2 ? { ...turnAction2, heal: battleStats.HEAL + battleStats.RES + rollDice(battleStats.diceValue) + battleStats.INT } : turnAction2;
-      // console.log('actionType: ', actionType, battleActions, turnAction2)
+      turnAction2 = { ...turnAction2, heal: battleStats.WIS + battleStats.RES + rollDice(battleStats.diceValue) + battleStats.INT };
+      console.log('actionType2: ', actionType2, battleActions, turnAction2, 'battleStats.HEAL ====>', battleStats)
       break;
     case battleActions.ILU:
-      turnAction2 = actionType2 ? { ...turnAction2, ilu: battleStats.WIS + battleStats.CHARM + rollDice(battleStats.diceValue) + battleStats.INT } : turnAction2;
-      // console.log('actionType: ', actionType, battleActions, turnAction2)
+      turnAction2 = { ...turnAction2, ilu: battleStats.WIS + battleStats.CHARM + rollDice(battleStats.diceValue) + battleStats.INT };
+      // console.log('actionType2: ', actionType2, battleActions, turnAction2)
       break;
     case battleActions.SKIP:
       break;
     default:
-      // turnAction2 = actionType2 ? { ...turnAction2, DEFAULT: true } : turnAction2;
-      // console.log('actionType: ', actionType, battleActions, turnAction2)
       break;
   }
 
@@ -286,9 +284,9 @@ async function takeTurn(CharID, BattleID, actionType, actionType2, objectiveID, 
 
   //Calculamos el HP actual del personaje
   const calculateDamage = (opponentTurn?.atk || 0) - (turnAction?.def || 0) - (turnAction2?.def || 0);
-  let newHp = prevHP - (calculateDamage >= 0 ? calculateDamage : 0);
+  let newHp = prevHP - (calculateDamage >= 0 ? calculateDamage : 0) - (opponentTurn?.counter ? opponentTurn?.counter : 0);
 
-  const selfHeal = turnAction?.heal || 0; // turnAction.heal es la cantidad de curación que se realiza en el turno.
+  const selfHeal = turnAction?.heal + turnAction2?.heal || 0; // turnAction.heal es la cantidad de curación que se realiza en el turno.
   newHp += selfHeal; // Sumamos la curación al HP actual del personaje.
   newHp = Math.min(newHp, battleStats.HP); // Si el HP actual es mayor que el HP máximo, lo igualamos al HP máximo.
   newHp = Math.max(newHp, 0); // Si el HP actual es menor que 0, lo igualamos a 0.
@@ -298,7 +296,7 @@ async function takeTurn(CharID, BattleID, actionType, actionType2, objectiveID, 
   // Además, si el ataque del oponente es menor que la defensa del personaje, se suma la diferencia entre la defensa del personaje y el ataque del oponente.
   const newDef = turnAction?.def + turnAction2?.def;
   const newCounter = opponentTurn?.atk < newDef ? newDef - opponentTurn?.atk : 0;
-  const newAtk = turnAction?.atk + turnAction2?.atk + newCounter
+  const newAtk = turnAction?.atk + turnAction2?.atk;
   const newHeal = turnAction?.heal + turnAction2?.heal;
   const newIlu = turnAction?.ilu + turnAction2?.ilu;
   console.log('PrevHP: ', prevHP, 'NewHP: ', newHp, 'opponentTurnAtk: ', opponentTurn?.atk, 'turnAction: ', newDef, newAtk, newHeal, newIlu)
@@ -314,6 +312,7 @@ async function takeTurn(CharID, BattleID, actionType, actionType2, objectiveID, 
     def: newDef || 0,
     heal: newHeal || 0,
     ilu: newIlu || 0,
+    counter: newCounter || 0,
   });
 
   if (!battleTurn) throw new Error("No hay ningún turno en curso.");
@@ -328,7 +327,7 @@ async function takeTurn(CharID, BattleID, actionType, actionType2, objectiveID, 
       }
     }
   )
-
+  console.log('battleTurn.currentHP', battleTurn.currentHP, 'battleStats.HP', battleStats.HP, 'newHp', newHp)
   // Comprobamos si el personaje ha muerto
   if (battleTurn.currentHP <= 0) {
     battleTurn.update(
@@ -373,12 +372,13 @@ async function takeTurn(CharID, BattleID, actionType, actionType2, objectiveID, 
       objectiveID: objectiveID,
       TurnResolved: false,
       TurnNumber: turnsLength.length + 1,
-      previousHP: prevHP,
+      previusHP: prevHP,
       currentHP: newHp,
       atk: newAtk || 0,
       def: newDef || 0,
       heal: newHeal || 0,
       ilu: newIlu || 0,
+      counter: newCounter || 0,
     },
   };
 }
