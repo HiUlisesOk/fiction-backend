@@ -7,7 +7,7 @@
     "start": "nodemon index.js",
     "test": "mocha -w ./tests/**/*.spec.js --timeout 10000"
   },
-  "author": "Henry",
+  "author": "HiUlisesOk",
   "license": "ISC",
   "engines": {
     "node": ">=12.18.3",
@@ -37,3 +37,4 @@
     "supertest-session": "^4.1.0"
   }
 }
+

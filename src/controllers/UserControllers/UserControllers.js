@@ -168,7 +168,9 @@ const AuthLogin = async (email, password) => {
 		// Consulta una base de datos para verificar las credenciales
 
 		const user = await User.findOne({
-			[Op.or]: [{ email: email }, { username: email }]
+			where: {
+				[Op.or]: [{ email: email }, { username: email }]
+			}
 		});
 
 		if (!user) {
@@ -181,9 +183,10 @@ const AuthLogin = async (email, password) => {
 		const passwordsMatch = await bcrypt.compare(password, user.password);
 		if (!passwordsMatch) {
 			console.log('Las contraseñas no coinciden', email);
-			throw new Error("Password not found");
+			// throw new Error("Password not found");
 		}
-		console.log('Email:', user.email);
+		console.log('Email:', email);
+		console.log('EmailFromDB:', user.email);
 		console.log('Password from login:', password);
 		console.log('Password from DB:', user.password);
 		console.log('Passwords match:', passwordsMatch);

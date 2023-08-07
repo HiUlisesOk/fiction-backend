@@ -62,7 +62,7 @@ server.post("/login", async (req, res, next) => {
     const { email, password } = req.body;
     const login = await AuthLogin(email, password)
     const { user, passwordsMatch } = login;
-    console.log('login', passwordsMatch, user)
+    console.log('login', passwordsMatch, user, password)
 
     if (!passwordsMatch) {
       res.status(401).json({ error: `Credenciales inválidas` });
