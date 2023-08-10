@@ -16,6 +16,7 @@ const {
 	deleteUser,
 	uploadProfilePicture,
 	getUserFromDb,
+	getUserByUsername,
 } = require("../../controllers/UserControllers/UserControllers");
 
 /**
@@ -75,6 +76,44 @@ userRouter.get("/get-user-info/:id", authenticateToken, async (req, res) => {
 		res.status(401).send(error.message);
 	}
 });
+
+/**
+ * @swagger
+ * /get-user-info:
+ *   get:
+ *     tags:
+ *       - Users
+ *     summary: Obtener información de usuario por nombre de usuario
+ *     description: Obtiene la información de un usuario por su nombre de usuario
+ *     parameters:
+ *       - name: username
+ *         in: query
+ *         required: true
+ *         description: Nombre de usuario del usuario a buscar
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: OK
+ *       400:
+ *         description: Error de solicitud inválida
+ */
+userRouter.get("/get-user-info", async (req, res) => {
+	try {
+		const { username } = req.query;
+
+		const userInfo = await getUserByUsername(username);
+
+		if (!userInfo) {
+			return res.status(404).send("Usuario no encontrado");
+		}
+
+		res.status(200).send(userInfo);
+	} catch (error) {
+		res.status(400).send(error.message);
+	}
+});
+
 
 /**
  * @swagger

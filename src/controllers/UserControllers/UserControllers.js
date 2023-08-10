@@ -33,6 +33,19 @@ async function getUserFromDb(userID) {
 	return matchingUser;
 }
 
+/// <=============== controller getUSER ===============>
+async function getUserByUsername(username) {
+	const matchingUser = await User.findOne({
+		where: {
+			username: username,
+		},
+	});
+
+	if (!matchingUser) throw new Error("El usuario no existe");
+	//Si la funcion no recibe nada, devuelve un error.
+	return matchingUser;
+}
+
 async function createUser(
 	username,
 	firstName,
@@ -275,5 +288,6 @@ module.exports = {
 	AuthLogin,
 	updateUser,
 	deleteUser,
-	getUserFromDb
+	getUserFromDb,
+	getUserByUsername,
 };

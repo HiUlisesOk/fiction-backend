@@ -102,7 +102,7 @@ async function createCharacter(
 }
 
 
-/// <=============== POST - UPDATE USER ===============>
+/// <=============== UPDATE USER ===============>
 
 async function updateCharacter(
 	ID,
@@ -133,7 +133,7 @@ async function updateCharacter(
 			charge: charge || "",
 			rank: rank || "",
 			guildName: guildName || "",
-			guildID: guildID || "",
+			guildID: guildID || null,
 			avatar: avatar || "",
 		},
 		{

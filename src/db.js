@@ -22,7 +22,7 @@ const Battle = require('./models/BattleModels/Battle')(sequelize);
 const BattleRounds = require('./models/BattleModels/BattleRounds')(sequelize);
 const BattleStats = require('./models/BattleModels/BattleStats')(sequelize);
 const BattleTurn = require('./models/BattleModels/BattleTurn')(sequelize);
-
+const ActionLog = require('./models/Logs/ActionsLogs')(sequelize);
 
 // Definimos las relaciones entre los modelos
 User.belongsToMany(Topic, { through: "UserTopics" });
@@ -73,7 +73,6 @@ BattleTurn.belongsTo(BattleStats);
 // ...
 
 
-
 // Exportamos los modelos y la conexión
 module.exports = {
   User,
@@ -87,5 +86,6 @@ module.exports = {
   Battle,
   BattleRounds,
   BattleTurn,
+  ActionLog,
   conn: sequelize,
 };
