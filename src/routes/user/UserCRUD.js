@@ -171,7 +171,7 @@ userRouter.post("/create-user", async (req, res) => {
  *               imagen64:
  *                 type: string
  *               ID:
- *                 type: string
+ *                 type: integer
  *               username:
  *                 type: string
  *               email:
@@ -225,7 +225,7 @@ userRouter.put("/update-profilePicture", authenticateToken, async (req, res) => 
  *             type: object
  *             properties:
  *               ID:
- *                 type: string
+ *                 type: integer
  *               username:
  *                 type: string
  *               firstName:
@@ -235,6 +235,8 @@ userRouter.put("/update-profilePicture", authenticateToken, async (req, res) => 
  *               birthDate:
  *                 type: string
  *               email:
+ *                 type: string
+ *               bio:
  *                 type: string
  *               userScore:
  *                 type: number
@@ -263,6 +265,7 @@ userRouter.put("/update-user", authenticateToken, async (req, res) => {
 			firstName,
 			lastName,
 			birthDate,
+			bio,
 			email,
 			userScore,
 			profilePicture,
@@ -274,6 +277,7 @@ userRouter.put("/update-user", authenticateToken, async (req, res) => {
 			firstName,
 			lastName,
 			birthDate,
+			bio,
 			email,
 			userScore,
 			profilePicture,

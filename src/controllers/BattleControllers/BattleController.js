@@ -147,8 +147,14 @@ async function takeTurn(CharID, BattleID, actionType, actionType2, objectiveID, 
     },
   });
 
+
   if (!battle) throw new Error("No hay ninguna batalla en curso con ese ID o la batalla ya ha finalizado y se ha declarado un ganador.");
 
+  //Si el personaje no está en la batalla, lo incluimos
+  const CharIsInBattle = await battle.Chars;
+
+  if (!CharIsInBattle.includes(Number(CharID))) battle.update({ Chars: [...CharIsInBattle, Number(CharID)] })
+  console.log('CharIsInBattle', await battle.Chars)
   // Obtener la ronda actual (Las rondas están en desuso actualmente y no cumplen función alguna)
   const battleRound = await BattleRounds.findOne({
     where: {
@@ -308,7 +314,7 @@ async function takeTurn(CharID, BattleID, actionType, actionType2, objectiveID, 
     TurnNumber: turnsLength.length + 1,
     previusHP: prevHP,
     currentHP: newHp,
-    atk: newAtk || 0,
+    atk: newAtk * 5 || 0,
     def: newDef || 0,
     heal: newHeal || 0,
     ilu: newIlu || 0,
@@ -385,9 +391,42 @@ async function takeTurn(CharID, BattleID, actionType, actionType2, objectiveID, 
 
 async function getAllBattles() {
   const allBattles = await Battle.findAll();
+
+  if (!allBattles) throw new Error('No hay batallas registradas.')
+
+  return allBattles;
 }
+
+async function getBattleById(id) {
+  const BattleById = await Battle.findOne({ where: { ID: id }, include: [BattleStats] });
+
+  if (!BattleById) throw new Error('La batalla no existe o no pudo ser econtrada.')
+
+  return BattleById;
+}
+
+async function getBattleStatsById(id) {
+  const battleStats = await BattleStats.findByPk(id);
+
+  if (!battleStats) throw new Error('Las estadísticas de batalla no existen o no pudieron ser econtradas.')
+
+  return battleStats;
+}
+
+async function getBattleByCharacterId(id) {
+  const battleStats = await battleStats.findOne({ where: { charID: id } })
+
+  if (!battleStats) throw new Error('Las estadísticas de batalla no existen o no pudieron ser econtradas con este id.')
+
+  return battleStats;
+}
+
 
 module.exports = {
   startBattle,
-  takeTurn
+  takeTurn,
+  getAllBattles,
+  getBattleById,
+  getBattleStatsById,
+  getBattleByCharacterId,
 };

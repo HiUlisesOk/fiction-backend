@@ -35,7 +35,11 @@ module.exports = (sequelize) => {
 			rank: {
 				type: DataTypes.STRING,
 				allowNull: true,
-			}
+			},
+			isActive: {
+				type: DataTypes.BOOLEAN,
+				defaultValue: true,
+			},
 		},
 		{
 			paranoid: true,

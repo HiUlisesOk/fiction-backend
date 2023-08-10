@@ -32,6 +32,10 @@ module.exports = (sequelize) => {
 				type: DataTypes.DATEONLY,
 				allowNull: true,
 			},
+			bio: {
+				type: DataTypes.TEXT,
+				allowNull: true,
+			},
 			email: {
 				type: DataTypes.STRING,
 				allowNull: false,

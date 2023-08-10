@@ -13,7 +13,7 @@ const {
 	getCharacterById,
 	createCharacter,
 	updateCharacter,
-	deletecharacter,
+	deleteCharacter,
 } = require("../../controllers/CharacterControllers/CharacterControllers");
 
 /**
@@ -246,7 +246,7 @@ characterRouter.delete("/delete-character", authenticateToken, async (req, res) 
 	try {
 		const { ID } = req.query;
 
-		const character = await deletecharacter(ID);
+		const character = await deleteCharacter(ID);
 		res.status(200).send(character);
 	} catch (error) {
 		res.status(400).send(error.message);
