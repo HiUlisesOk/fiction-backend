@@ -14,7 +14,7 @@ const { uploadImage } = require('../imagesControllers')
 
 /// <=============== controller getAllCharacters ===============>
 async function getAllCharacters() {
-	const character = await Character.findAll();
+	const character = await Character.findAll({ where: { isActive: true, } });
 	//Si la funcion no recibe nada, devuelve un error.
 	if (!character) throw new Error("No se encontraron personajes");
 	return character;
@@ -22,7 +22,12 @@ async function getAllCharacters() {
 
 /// <=============== controller getCharacter ===============>
 async function getCharacterById(ID) {
-	const matchingCharacter = await Character.findByPk(ID);
+	const matchingCharacter = await Character.findOne({
+		where: {
+			ID: ID,
+			[Op.and]: [{ isActive: true }]
+		}
+	});
 
 	if (!matchingCharacter) throw new Error("El personaje no existe");
 	//Si la funcion no recibe nada, devuelve un error.
@@ -64,15 +69,15 @@ async function createCharacter(
 			level: 0,
 			diceName: "default",
 			diceID: 1,
-			diceValue: 5,
-			EXP: 1,
+			diceValue: 10,
+			EXP: 5,
 			HP: 100,
-			STR: 1,
-			AGI: 1,
-			INT: 1,
-			RES: 1,
-			CHARM: 1,
-			WIS: 1,
+			STR: 5,
+			AGI: 5,
+			INT: 5,
+			RES: 5,
+			CHARM: 5,
+			WIS: 5,
 		});
 
 		if (!stats) throw new Error("No se pudieron añadir stats a este personaje.");
@@ -115,6 +120,7 @@ async function updateCharacter(
 	const matchingCharacter = await Character.findOne({
 		where: {
 			[Op.or]: [{ ID: ID }, { name: name }],
+
 		}
 	});
 
@@ -156,19 +162,26 @@ async function updateCharacter(
 
 
 //   ||==============| Delete Character |===============ooo<>
-// To delete an user.
-const deleteUser = async (ID) => {
+// To delete a Character.
+const deleteCharacter = async (ID) => {
 	const character = await Character.findByPk(ID)
 
 	if (!character) throw new Error("Character not found");
 
-	await Character.destroy({
-		where: {
-			ID: ID,
+	await Character.update(
+		{
+			isActive: false,
 		},
-	});
+		{
+			where: { ID: ID },
+		}
+	);
 
-	return character;
+	const characterUpdated = await Character.findByPk(ID)
+
+	if (!characterUpdated) throw new Error("Character not found");
+
+	return characterUpdated;
 }
 
 
@@ -177,5 +190,5 @@ module.exports = {
 	getCharacterById,
 	createCharacter,
 	updateCharacter,
-	deleteUser,
+	deleteCharacter,
 };

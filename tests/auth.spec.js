@@ -1,22 +1,29 @@
 const { expect } = require('chai');
-const { conn } = require('../../src/db');
-const User = require('../../src/models/UserModels/User');
-const AuthLogin = require('../../src/controllers/UserControllers/UserControllers');
+const User = require('../src/models/UserModels/User');
+const AuthLogin = require('../src/controllers/UserControllers/UserControllers');
+
+const sequelize = new Sequelize(
+	`postgres://postgres:1234@localhost:5432/postgres`,
+	{
+		logging: false,
+		native: false,
+	}
+);
 
 describe('User model', () => {
 	before(async () => {
 		// Conectar a la base de datos de prueba
-		await conn.authenticate();
+		await sequelize.authenticate();
 	});
 
 	after(async () => {
 		// Desconectar de la base de datos de prueba
-		await conn.close();
+		await sequelize.close();
 	});
 
 	beforeEach(async () => {
 		// Sincronizar los modelos con la base de datos de prueba
-		await conn.sync({ force: true });
+		await sequelize.sync({ force: true });
 	});
 
 	it('should create a new user', async () => {
