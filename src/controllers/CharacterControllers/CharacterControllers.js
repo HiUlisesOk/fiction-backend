@@ -119,8 +119,7 @@ async function updateCharacter(
 
 	const matchingCharacter = await Character.findOne({
 		where: {
-			[Op.or]: [{ ID: ID }, { name: name }],
-
+			ID: ID,
 		}
 	});
 
@@ -144,7 +143,7 @@ async function updateCharacter(
 
 	const updatedCharacter = await Character.findOne({
 		where: {
-			[Op.or]: [{ name: name }, { ID: ID }],
+			ID: ID,
 		},
 
 	});
