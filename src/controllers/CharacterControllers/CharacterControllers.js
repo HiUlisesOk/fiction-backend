@@ -102,7 +102,7 @@ async function createCharacter(
 }
 
 
-/// <=============== POST - UPDATE USER ===============>
+/// <=============== UPDATE USER ===============>
 
 async function updateCharacter(
 	ID,
@@ -119,8 +119,7 @@ async function updateCharacter(
 
 	const matchingCharacter = await Character.findOne({
 		where: {
-			[Op.or]: [{ ID: ID }, { name: name }],
-
+			ID: ID,
 		}
 	});
 
@@ -129,12 +128,12 @@ async function updateCharacter(
 
 	const updateThisCharacter = await Character.update(
 		{
-			name: name || "",
-			charge: charge || "",
-			rank: rank || "",
-			guildName: guildName || "",
-			guildID: guildID || "",
-			avatar: avatar || "",
+			name: name || matchingCharacter.name,
+			charge: charge || matchingCharacter.charge,
+			rank: rank || matchingCharacter.rank,
+			guildName: guildName || matchingCharacter.guildName,
+			guildID: guildID || matchingCharacter.guildID,
+			avatar: avatar || matchingCharacter.avatar,
 		},
 		{
 			where: { ID: ID },
@@ -144,7 +143,7 @@ async function updateCharacter(
 
 	const updatedCharacter = await Character.findOne({
 		where: {
-			[Op.or]: [{ name: name }, { ID: ID }],
+			ID: ID,
 		},
 
 	});
