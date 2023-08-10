@@ -129,12 +129,12 @@ async function updateCharacter(
 
 	const updateThisCharacter = await Character.update(
 		{
-			name: name || "",
-			charge: charge || "",
-			rank: rank || "",
-			guildName: guildName || "",
-			guildID: guildID || null,
-			avatar: avatar || "",
+			name: name || matchingCharacter.name,
+			charge: charge || matchingCharacter.charge,
+			rank: rank || matchingCharacter.rank,
+			guildName: guildName || matchingCharacter.guildName,
+			guildID: guildID || matchingCharacter.guildID,
+			avatar: avatar || matchingCharacter.avatar,
 		},
 		{
 			where: { ID: ID },
