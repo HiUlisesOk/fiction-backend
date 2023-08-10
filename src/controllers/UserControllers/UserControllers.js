@@ -103,6 +103,7 @@ async function updateUser(
 	firstName,
 	lastName,
 	birthDate,
+	bio,
 	email,
 	userScore,
 	profilePicture,
@@ -112,6 +113,7 @@ async function updateUser(
 	if (!username) throw new Error("Falta firstName");
 	if (!firstName) throw new Error("Falta firstName");
 	if (!lastName) throw new Error("Falta lastName");
+	if (!bio) throw new Error("Falta biography");
 	if (!birthDate) throw new Error("Falta birthDate");
 	if (!email) throw new Error("Falta email");
 	if (!userScore) throw new Error("Falta userScore");
@@ -133,6 +135,7 @@ async function updateUser(
 			lastName: lastName,
 			profilePicture: profilePicture,
 			birthDate: generateDateOnly(),
+			bio: bio,
 			email: email,
 			userScore: userScore,
 		},
