@@ -14,6 +14,8 @@ const {
 	createCharacter,
 	updateCharacter,
 	deleteCharacter,
+	getCharacterByUserId,
+	getCharacterByUsername,
 } = require("../../controllers/CharacterControllers/CharacterControllers");
 
 /**
@@ -43,7 +45,7 @@ characterRouter.get("/get-all-characters", authenticateToken, async (req, res) =
 
 /**
  * @swagger
- * /get-character-info/{id}:
+ * /get-character-info:
  *   get:
  *     tags:
  *       - characters
@@ -52,7 +54,7 @@ characterRouter.get("/get-all-characters", authenticateToken, async (req, res) =
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - in: path
+ *       - in: query
  *         name: id
  *         description: ID del personaje a obtener
  *         required: true
@@ -61,18 +63,99 @@ characterRouter.get("/get-all-characters", authenticateToken, async (req, res) =
  *     responses:
  *       200:
  *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Character'
  *       401:
  *         description: Error de autenticación
  */
-characterRouter.get("/get-character-info/:id", authenticateToken, async (req, res) => {
+characterRouter.get("/get-character-info", authenticateToken, async (req, res) => {
 	try {
-		const characterID = req.params.id;
+		const characterID = req.query.id;
 		const characterInfo = await getCharacterById(characterID);
 		res.status(200).send(characterInfo);
 	} catch (error) {
 		res.status(401).send(error.message);
 	}
 });
+
+/**
+ * @swagger
+ * /get-character-by-username:
+ *   get:
+ *     tags:
+ *       - characters
+ *     summary: Obtener información de un personaje por nombre de usuario
+ *     description: Obtiene la información de un personaje específico por su nombre de usuario
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: username
+ *         description: Nombre de usuario del personaje a obtener
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Character'
+ *       401:
+ *         description: Error de autenticación
+ */
+characterRouter.get("/get-character-by-username", authenticateToken, async (req, res) => {
+	try {
+		const username = req.query.username;
+		const characterInfo = await getCharacterByUsername(username);
+		res.status(200).send(characterInfo);
+	} catch (error) {
+		res.status(401).send(error.message);
+	}
+});
+
+/**
+ * @swagger
+ * /get-character-by-UserID:
+ *   get:
+ *     tags:
+ *       - characters
+ *     summary: Obtener información de un personaje por id de usuario
+ *     description: Obtiene la información de un personaje específico por el id de un usuario
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: UserID
+ *         description: ID de usuario del personaje a obtener
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Character'
+ *       401:
+ *         description: Error de autenticación
+ */
+characterRouter.get("/get-character-by-UserID", authenticateToken, async (req, res) => {
+	try {
+		const UserID = req.query.UserID;
+		const characterInfo = await getCharacterByUserId(UserID);
+		res.status(200).send(characterInfo);
+	} catch (error) {
+		res.status(401).send(error.message);
+	}
+});
+
+
+
 
 /**
  * @swagger

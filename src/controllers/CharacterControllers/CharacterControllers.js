@@ -34,6 +34,41 @@ async function getCharacterById(ID) {
 	return matchingCharacter;
 }
 
+async function getCharacterByUserId(ID) {
+	const matchingCharacter = await Character.findAll({
+		where: {
+			UserID: ID,
+			[Op.and]: [{ isActive: true }]
+		}
+	});
+
+	if (!matchingCharacter) throw new Error("El personaje no existe");
+	//Si la funcion no recibe nada, devuelve un error.
+	return matchingCharacter;
+}
+
+async function getCharacterByUsername(ID) {
+
+	const matchingUser = await User.findOne({
+		where: {
+			username: ID,
+		}
+	});
+
+	if (!matchingUser) throw new Error("El usuario no existe");
+
+	const matchingCharacter = await Character.findAll({
+		where: {
+			UserID: matchingUser.ID,
+			[Op.and]: [{ isActive: true }]
+		}
+	});
+
+	if (!matchingCharacter) throw new Error("El personaje no existe");
+	//Si la funcion no recibe nada, devuelve un error.
+	return matchingCharacter;
+}
+
 /// <=============== controller createCharacter ===============>
 async function createCharacter(
 	userID,
@@ -190,4 +225,6 @@ module.exports = {
 	createCharacter,
 	updateCharacter,
 	deleteCharacter,
+	getCharacterByUserId,
+	getCharacterByUsername,
 };
