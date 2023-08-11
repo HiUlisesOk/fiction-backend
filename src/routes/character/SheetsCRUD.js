@@ -9,7 +9,7 @@ const { Router } = require("express");
 const sheetRouter = Router();
 const { authenticateToken } = require('../../utils/Auth');
 const {
-	getAllSheets, getSheetsById, createSheets, updateSheet, deleteSheet
+	getAllSheets, getSheetsById, createSheets, updateSheet, deleteSheet, getSheetsByUserId
 } = require("../../controllers/CharacterControllers/SheetsControllers");
 
 /**
@@ -64,6 +64,39 @@ sheetRouter.get("/get-sheet-info/:id", authenticateToken, async (req, res) => {
 	try {
 		const ID = req.params.id;
 		const sheetInfo = await getSheetsById(ID);
+		res.status(200).send(sheetInfo);
+	} catch (error) {
+		res.status(401).send(error.message);
+	}
+});
+
+/**
+ * @swagger
+ * /get-sheet-info/{id}:
+ *   get:
+ *     tags:
+ *       - Roleplay Sheets
+ *     summary: Obtener información de una ficha de rol por ID del personaje
+ *     description: Obtiene la información de una ficha de rol específico por id del personaje
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         description: ID de la ficha de rol a obtener
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: OK
+ *       401:
+ *         description: Error de autenticación
+ */
+sheetRouter.get("/get-sheet-info/:id", authenticateToken, async (req, res) => {
+	try {
+		const ID = req.params.id;
+		const sheetInfo = await getSheetsByUserId(ID);
 		res.status(200).send(sheetInfo);
 	} catch (error) {
 		res.status(401).send(error.message);

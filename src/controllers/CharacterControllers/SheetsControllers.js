@@ -29,6 +29,15 @@ async function getSheetsById(ID) {
 	return matchingSheets;
 }
 
+/// <=============== controller getCharacter ===============>
+async function getSheetsByUserId(ID) {
+	const matchingSheets = await Character_Info.findAll({ where: { CharacterID: ID } });
+
+	if (!matchingSheets) throw new Error("El personaje no existe");
+	//Si la funcion no recibe nada, devuelve un error.
+	return matchingSheets;
+}
+
 /// <=============== controller createSheets ===============>
 async function createSheets(
 
