@@ -2,7 +2,7 @@ const { Router } = require("express");
 const skillsRouter = Router();
 const { authenticateToken } = require('../../utils/Auth');
 const {
-	getAllSkills, getSkillsById, createSkills, updateSkills, deleteSkill
+	getAllSkills, getSkillsById, createSkills, updateSkills, deleteSkill, getSkillsByCharId
 } = require("../../controllers/CharacterControllers/SkillsControllers");
 
 /**
@@ -58,6 +58,39 @@ skillsRouter.get("/get-skills-by-id/:id", authenticateToken, async (req, res) =>
 	try {
 		const ID = req.params.id;
 		const skillInfo = await getSkillsById(ID);
+		res.status(200).send(skillInfo);
+	} catch (error) {
+		res.status(404).send(error.message);
+	}
+});
+
+/**
+ * @swagger
+ * /get-skills-by-charid/{id}:
+ *   get:
+ *     tags:
+ *       - Roleplay Skills
+ *     summary: Obtener información de una habilidad por ID
+ *     description: Obtiene la información de una habilidad específica por su ID
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         description: ID de la habilidad a obtener
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: OK
+ *       401:
+ *         description: Error de autenticación
+ */
+skillsRouter.get("/get-skills-by-charid/:id", authenticateToken, async (req, res) => {
+	try {
+		const ID = req.params.id;
+		const skillInfo = await getSkillsByCharId(ID);
 		res.status(200).send(skillInfo);
 	} catch (error) {
 		res.status(404).send(error.message);

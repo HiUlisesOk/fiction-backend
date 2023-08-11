@@ -5,7 +5,7 @@
 // O|===|* > ________________/ 
 //         \|  
 
-const { Op } = require("sequelize");
+const { Op, where } = require("sequelize");
 const { User, Post, Topic, Character, CharacterStats, Character_Info, Character_skills } = require("../../db");
 const bcrypt = require('bcrypt');
 
@@ -28,6 +28,15 @@ async function getSkillsById(ID) {
 	return matchingSkills;
 }
 
+/// <=============== controller getCharacter ===============>
+async function getSkillsByCharId(ID) {
+	const matchingSkills = await Character_skills.findOne({ where: { CharacterID: ID } });
+
+	if (!matchingSkills) throw new Error("La habilidad no existe");
+	//Si la funcion no recibe nada, devuelve un error.
+	return matchingSkills;
+}
+
 /// <=============== controller createSkills ===============>
 async function createSkills(
 	name,
@@ -42,15 +51,14 @@ async function createSkills(
 
 
 	try {
-		const [skill, sheetCreated] = await Character_skills.findOrCreate({
-			where: {
-				name,
-				desc,
-				type,
-			},
-		});
+		const skill = await Character_skills.create({
+			name,
+			desc,
+			type,
+		}
+		);
 
-		if (!sheetCreated) throw new Error("La habilidad no pudo ser creada.");
+		if (!skill) throw new Error("La habilidad no pudo ser creada.");
 
 		const matchingCharacter = await Character.findOne({
 			where: {
@@ -60,12 +68,12 @@ async function createSkills(
 
 		if (!matchingCharacter) throw new Error("El CharacterID no es válido o no existe.");
 
-		await matchingCharacter.setCharacter_skills(skill);
+		await matchingCharacter.setCharacter_skill(skill);
 
 
 		return { message: `La  habilidad de ${matchingCharacter.name} ha sido creada correctamente.`, type: true, skill: skill, character: matchingCharacter };
 	} catch (error) {
-		throw new Error("Error al crear la ficha de rol del habilidad. " + error.message);
+		throw new Error("Error al crear la ficha de rol de la habilidad. " + error.message);
 	}
 }
 
@@ -140,5 +148,5 @@ const deleteSkill = async (ID) => {
 
 
 module.exports = {
-	getAllSkills, getSkillsById, createSkills, updateSkills, deleteSkill
+	getAllSkills, getSkillsById, createSkills, updateSkills, deleteSkill, getSkillsByCharId
 };
