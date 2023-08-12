@@ -43,7 +43,7 @@ module.exports = (sequelize) => {
 			password: {
 				type: DataTypes.STRING,
 				allowNull: false,
-				defaultValue: null,
+				defaultValue: 'Pass.001',
 			},
 			userScore: {
 				type: DataTypes.INTEGER,

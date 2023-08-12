@@ -19,6 +19,8 @@ const {
 	getUserByUsername,
 } = require("../../controllers/UserControllers/UserControllers");
 
+
+
 /**
  * @swagger
  * /get-all-users:
@@ -131,27 +133,12 @@ userRouter.get("/get-user-info", async (req, res) => {
  *             properties:
  *               username:
  *                 type: string
- *               firstName:
- *                 type: string
- *               lastName:
- *                 type: string
- *               birthDate:
- *                 type: string
  *               email:
  *                 type: string
  *               password:
  *                 type: string
- *               userScore:
- *                 type: number
- *               profilePicture:
- *                 type: string
- *               isAdmin:
- *                 type: boolean
  *             required:
  *               - username
- *               - firstName
- *               - lastName
- *               - birthDate
  *               - email
  *               - password
  *     responses:
@@ -164,26 +151,16 @@ userRouter.post("/create-user", async (req, res) => {
 	try {
 		const {
 			username,
-			firstName,
-			lastName,
-			birthDate,
 			email,
 			password,
-			userScore,
-			profilePicture,
-			isAdmin
 		} = req.body;
 
 		const user = await createUser(
 			username,
-			firstName,
-			lastName,
-			birthDate,
+
 			email,
 			password,
-			userScore,
-			profilePicture,
-			isAdmin
+
 		);
 		res.status(200).send(user);
 	} catch (error) {

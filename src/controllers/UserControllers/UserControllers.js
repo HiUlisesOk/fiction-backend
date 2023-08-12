@@ -6,11 +6,11 @@
 //         \|  
 
 const { Op } = require("sequelize");
-const { User, Post, Topic } = require("../../db");
+const { User, Post, Topic, Roles } = require("../../db");
 const { generateDateOnly, generateDateTime } = require('../../utils/date')
 const bcrypt = require('bcrypt');
 const { uploadImage } = require('../imagesControllers')
-
+const { getRolesFromUserID, addRol } = require("../../controllers/Roles/userRoles");
 
 /// <=============== controller getAllUsers ===============>
 async function getAllUsersFromDb() {
@@ -46,15 +46,12 @@ async function getUserByUsername(username) {
 	return matchingUser;
 }
 
+/// <=============== CREATE USER ===============>
 async function createUser(
 	username,
-	firstName,
-	lastName,
-	birthDate,
 	email,
 	password,
-	userScore,
-	profilePicture,
+
 ) {
 	if (!username) throw new Error("Falta username");
 	if (!email) throw new Error("Falta email");
@@ -88,8 +85,9 @@ async function createUser(
 			// Otros campos del topic
 		});
 
+		if (!topic) throw new Error("El topic no pudo ser creado");
+
 		const post = await Post.create({
-			title: 'Mi primer post',
 			content: 'Hola! 😎',
 			author: username,
 			authorID: user.ID,
@@ -97,9 +95,16 @@ async function createUser(
 			// Otros campos del post
 		});
 
+		if (!post) throw new Error("El post no pudo ser creado");
+
 		await user.addPost(post);
 		await user.addTopic(topic);
 		await post.setTopic(topic);
+
+
+		const AddRoleToUser = await addRol(1, user.ID)
+
+		if (!AddRoleToUser) throw new Error("El rol no pudo ser asignado");
 
 		return { message: `El usuario ${username} ha sido creado correctamente`, type: true };
 	} catch (error) {
@@ -207,7 +212,7 @@ const AuthLogin = async (email, password) => {
 		console.log('Password from DB:', user.password);
 		console.log('Passwords match:', passwordsMatch);
 
-		return { passwordsMatch, user: { ID: user.ID, username: user.username, firstName: user.firstName, email: user.email } };
+		return { passwordsMatch, user: { ID: user.ID, username: user.username, firstName: user.firstName } };
 	} catch (error) {
 		console.error('Authentication error:', error);
 		throw error;
@@ -279,6 +284,14 @@ async function uploadProfilePicture(imagen64, ID, username, email) {
 	}
 }
 
+// Ejemplo de middleware para verificar el rol de administrador
+const isAdmin = (req, res, next) => {
+	if (req.user && req.user.role === 'admin') {
+		next(); // Permitir el acceso si el usuario es administrador
+	} else {
+		res.status(403).json({ message: 'Acceso denegado' }); // Denegar acceso si no es administrador
+	}
+};
 
 
 module.exports = {
