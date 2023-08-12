@@ -23,9 +23,11 @@ const BattleRounds = require('./models/BattleModels/BattleRounds')(sequelize);
 const BattleStats = require('./models/BattleModels/BattleStats')(sequelize);
 const BattleTurn = require('./models/BattleModels/BattleTurn')(sequelize);
 const ActionLog = require('./models/Logs/ActionsLogs')(sequelize);
+const Roles = require('./models/UserModels/Roles')(sequelize);
 
 // Definimos las relaciones entre los modelos
 User.belongsToMany(Topic, { through: "UserTopics" });
+User.belongsToMany(Roles, { through: "UserRoles" });
 User.hasMany(Post);
 User.hasMany(Character);
 
@@ -35,6 +37,8 @@ Topic.hasMany(Post);
 Post.belongsTo(User);
 Post.belongsTo(Topic);
 
+// ...
+Roles.belongsToMany(User, { through: "UserRoles" });
 // ...
 
 Character.belongsTo(User);
@@ -87,5 +91,6 @@ module.exports = {
   BattleRounds,
   BattleTurn,
   ActionLog,
+  Roles,
   conn: sequelize,
 };
