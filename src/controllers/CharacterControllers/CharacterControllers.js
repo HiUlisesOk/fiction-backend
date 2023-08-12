@@ -39,6 +39,8 @@ async function getCharacterByUserId(ID) {
 		where: {
 			UserID: ID,
 			[Op.and]: [{ isActive: true }]
+		}, include: {
+			model: CharacterStats,
 		}
 	});
 
