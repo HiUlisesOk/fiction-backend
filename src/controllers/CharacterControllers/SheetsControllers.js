@@ -30,7 +30,7 @@ async function getSheetsById(ID) {
 }
 
 /// <=============== controller getCharacter ===============>
-async function getSheetsByUserId(ID) {
+async function getSheetByCharId(ID) {
 	const matchingSheets = await Character_Info.findAll({ where: { CharacterID: ID } });
 
 	if (!matchingSheets) throw new Error("El personaje no existe");
@@ -192,5 +192,5 @@ const deleteSheet = async (ID) => {
 
 
 module.exports = {
-	getAllSheets, getSheetsById, createSheets, updateSheet, deleteSheet
+	getAllSheets, getSheetsById, createSheets, updateSheet, deleteSheet, getSheetByCharId
 };

@@ -62,7 +62,7 @@ server.post("/login", async (req, res, next) => {
     const { email, password } = req.body;
     const login = await AuthLogin(email, password)
     const { user, passwordsMatch } = login;
-    console.log('login', passwordsMatch, user)
+    // console.log('login', passwordsMatch, user)
 
     if (!passwordsMatch) {
       res.status(401).json({ error: `Credenciales inválidas` });
@@ -70,7 +70,7 @@ server.post("/login", async (req, res, next) => {
     }
 
     // Generar el token de autenticación
-    const token = jwt.sign({ email }, process.env.secretToken);
+    const token = jwt.sign({ id: user.ID, email }, process.env.secretToken);
 
     /**
      * @swagger

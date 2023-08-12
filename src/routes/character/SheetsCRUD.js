@@ -9,7 +9,7 @@ const { Router } = require("express");
 const sheetRouter = Router();
 const { authenticateToken } = require('../../utils/Auth');
 const {
-	getAllSheets, getSheetsById, createSheets, updateSheet, deleteSheet, getSheetsByUserId
+	getAllSheets, getSheetsById, createSheets, updateSheet, deleteSheet, getSheetByCharId
 } = require("../../controllers/CharacterControllers/SheetsControllers");
 
 /**
@@ -72,7 +72,7 @@ sheetRouter.get("/get-sheet-info/:id", authenticateToken, async (req, res) => {
 
 /**
  * @swagger
- * /get-sheet-info/{id}:
+ * /get-sheet-getSheetByCharId/{id}:
  *   get:
  *     tags:
  *       - Roleplay Sheets
@@ -93,10 +93,10 @@ sheetRouter.get("/get-sheet-info/:id", authenticateToken, async (req, res) => {
  *       401:
  *         description: Error de autenticación
  */
-sheetRouter.get("/get-sheet-info/:id", authenticateToken, async (req, res) => {
+sheetRouter.get("/get-sheet-getSheetByCharId/:id", authenticateToken, async (req, res) => {
 	try {
 		const ID = req.params.id;
-		const sheetInfo = await getSheetsByUserId(ID);
+		const sheetInfo = await getSheetByCharId(ID);
 		res.status(200).send(sheetInfo);
 	} catch (error) {
 		res.status(401).send(error.message);

@@ -7,7 +7,7 @@
 
 const { Router } = require("express");
 const userRouter = Router();
-const { authenticateToken } = require('../../utils/Auth');
+const { authenticateToken, isAdmin } = require('../../utils/Auth');
 const {
 	getAllUsersFromDb,
 	createUser,
@@ -327,7 +327,7 @@ userRouter.put("/update-user", authenticateToken, async (req, res) => {
  *       400:
  *         description: Error de solicitud inválida
  */
-userRouter.delete("/delete-user", authenticateToken, async (req, res) => {
+userRouter.delete("/delete-user", authenticateToken, isAdmin, async (req, res) => {
 	try {
 		const { ID } = req.query;
 
