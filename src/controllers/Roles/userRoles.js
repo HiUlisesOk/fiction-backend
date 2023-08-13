@@ -26,6 +26,30 @@ async function getRolesFromUserID(id) {
 	return roles;
 }
 
+/// <=============== controller User has Role ===============>
+async function userHasRole(id, rolID) {
+	const user = await User.findByPk(id);
+	if (!user) throw new Error("El usuario no existe");
+
+	const matchingRole = await Roles.findOne({
+		where: {
+			ID: rolID,
+		},
+	});
+
+	if (!matchingRole) throw new Error("El rol que intentas añadir no existe");
+	//Si la funcion no recibe nada, devuelve un error.
+
+	const roles = await user.getRoles();
+	if (!roles) throw new Error("No se encontraron roles para este usuario");
+
+	const userHasRole = roles?.find((role) => role.ID === matchingRole.ID);
+
+	if (userHasRole) return true;
+
+	return false;
+}
+
 /// <=============== controller addRol ===============>
 async function addRol(rol, userID) {
 	if (!rol) throw new Error("Falta rol");
@@ -58,5 +82,5 @@ async function addRol(rol, userID) {
 module.exports = {
 	getRolesFromUserID,
 	addRol,
-
+	userHasRole
 };

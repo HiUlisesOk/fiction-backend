@@ -195,27 +195,26 @@ const AuthLogin = async (email, password) => {
 		});
 
 		if (!user) {
-			console.log('User email not found:', email);
+			// console.log('User email not found:', email);
 			throw new Error("User email not found");
 		}
 
-		console.log('User found:', user.email);
+		// console.log('User found:', user.email);
 
 		const passwordsMatch = await bcrypt.compare(password, user.password);
 		if (!passwordsMatch) {
 			console.log('Las contraseñas no coinciden', email);
 			// throw new Error("Password not found");
 		}
-		console.log('Email:', email);
-		console.log('EmailFromDB:', user.email);
-		console.log('Password from login:', password);
-		console.log('Password from DB:', user.password);
-		console.log('Passwords match:', passwordsMatch);
+		// console.log('Email:', email);
+		// console.log('EmailFromDB:', user.email);
+		// console.log('Password from login:', password);
+		// console.log('Password from DB:', user.password);
+		// console.log('Passwords match:', passwordsMatch);
 
 		return { passwordsMatch, user: { ID: user.ID, username: user.username, firstName: user.firstName } };
 	} catch (error) {
-		console.error('Authentication error:', error);
-		throw error;
+		return 'Authentication error: ' + error.message;
 	}
 };
 
