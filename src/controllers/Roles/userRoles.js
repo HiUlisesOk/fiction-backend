@@ -27,17 +27,17 @@ async function getRolesFromUserID(id) {
 }
 
 /// <=============== controller User has Role ===============>
-async function userHasRole(id, rolID) {
+async function userHasRole(id, rol) {
 	const user = await User.findByPk(id);
 	if (!user) throw new Error("El usuario no existe");
 
 	const matchingRole = await Roles.findOne({
 		where: {
-			ID: rolID,
+			rolename: rol,
 		},
 	});
 
-	if (!matchingRole) throw new Error("El rol que intentas añadir no existe");
+	if (!matchingRole) throw new Error("El rol que intentas encontrar en este usuario no existe");
 	//Si la funcion no recibe nada, devuelve un error.
 
 	const roles = await user.getRoles();
@@ -63,13 +63,12 @@ async function addRol(rol, userID) {
 
 	const matchingRole = await Roles.findOne({
 		where: {
-			ID: rol,
+			value: rol,
 		},
 	});
 
 	if (!matchingRole) throw new Error("El rol que intentas añadir no existe");
 	//Si la funcion no recibe nada, devuelve un error.
-
 
 	const userHasRole = roles?.find((role) => role.ID === matchingRole.ID);
 
@@ -79,8 +78,33 @@ async function addRol(rol, userID) {
 	return matchingRole;
 }
 
+/// <=============== controller CreateRol ===============>
+// roleName: "user"
+// value: 1
+async function createRol(rolName, value) {
+	const rol = await Roles.findOne({ where: { rolename: rolName, value: value } });
+
+	if (rol) throw new Error("El rol ya existe y su id es: " + rol.ID);
+
+	const rolCreated = await Roles.create({ rolename: rolName, value: value });
+
+	//Si la funcion no recibe nada, devuelve un error.
+	if (!rolCreated) throw new Error("No se pudo crear el rol");
+	console.log(rolCreated)
+	return rolCreated;
+}
+
+/// <=============== controller rolExist ===============>
+async function rolExist(rolName, value) {
+	const rol = await Roles.findOne({ where: { rolename: rolName, value: value } });
+	return rol ? true : false;
+}
+
+
 module.exports = {
 	getRolesFromUserID,
 	addRol,
-	userHasRole
+	userHasRole,
+	rolExist,
+	createRol
 };

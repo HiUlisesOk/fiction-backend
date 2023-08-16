@@ -7,7 +7,7 @@
 
 const { Router } = require("express");
 const userRouter = Router();
-const { authenticateToken, isAdmin } = require('../../utils/Auth');
+const { authenticateToken, isAdmin, userRestrict } = require('../../utils/Auth');
 const {
 	getAllUsersFromDb,
 	createUser,
@@ -203,7 +203,7 @@ userRouter.post("/create-user", async (req, res) => {
  *       400:
  *         description: Error de solicitud inválida
  */
-userRouter.put("/update-profilePicture", authenticateToken, async (req, res) => {
+userRouter.put("/update-profilePicture", authenticateToken, userRestrict, async (req, res) => {
 	try {
 		const {
 			imagen64,
@@ -273,7 +273,7 @@ userRouter.put("/update-profilePicture", authenticateToken, async (req, res) => 
  *       400:
  *         description: Error de solicitud inválida
  */
-userRouter.put("/update-user", authenticateToken, async (req, res) => {
+userRouter.put("/update-user", authenticateToken, userRestrict, async (req, res) => {
 	try {
 		const {
 			ID,

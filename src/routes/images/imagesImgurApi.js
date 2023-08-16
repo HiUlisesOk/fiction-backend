@@ -7,7 +7,7 @@
 
 const { Router } = require("express");
 const imagesImgurAPI = Router();
-const { authenticateToken } = require('../../utils/Auth');
+const { authenticateToken, isAdmin, userRestrict } = require('../../utils/Auth');
 const { generateAccessToken, uploadImage } = require('../../controllers/imagesControllers.js');
 const convertImageToBase64 = require('../../utils/convertImageToBase64');
 
@@ -27,7 +27,7 @@ const convertImageToBase64 = require('../../utils/convertImageToBase64');
  *       401:
  *         description: Error de autenticación
  */
-imagesImgurAPI.get("/get-imgur-image-token", authenticateToken, async (req, res) => {
+imagesImgurAPI.get("/get-imgur-image-token", authenticateToken, isAdmin, async (req, res) => {
 	try {
 		const token = await generateAccessToken();
 		process.env.bearer_token = 'Bearer ' + token;

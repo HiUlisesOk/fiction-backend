@@ -10,7 +10,15 @@ const { User, Post, Topic, Roles } = require("../../db");
 const { generateDateOnly, generateDateTime } = require('../../utils/date')
 const bcrypt = require('bcrypt');
 const { uploadImage } = require('../imagesControllers')
-const { getRolesFromUserID, addRol } = require("../../controllers/Roles/userRoles");
+const {
+	getRolesFromUserID,
+	addRol,
+	userHasRole,
+	rolExist,
+	createRol
+} = require("../../controllers/Roles/userRoles");
+
+const { getAllLogs, addLog } = require('../Logs/LogsControllers')
 
 /// <=============== controller getAllUsers ===============>
 async function getAllUsersFromDb() {
@@ -101,10 +109,18 @@ async function createUser(
 		await user.addTopic(topic);
 		await post.setTopic(topic);
 
+		const rolVerify = await rolExist('user', 1)
+
+		if (!rolVerify) {
+			const rol = await createRol('user', 1)
+			if (!rol) throw new Error("El rol no pudo ser creado");
+		}
 
 		const AddRoleToUser = await addRol(1, user.ID)
 
 		if (!AddRoleToUser) throw new Error("El rol no pudo ser asignado");
+
+		addLog(1, user.ID, null, `${username} se ha unido a nosotros`, false, true)
 
 		return { message: `El usuario ${username} ha sido creado correctamente`, type: true };
 	} catch (error) {
@@ -276,6 +292,7 @@ async function uploadProfilePicture(imagen64, ID, username, email) {
 			}
 		);
 
+		addLog(1, ID, null, `${username} ahora tiene una foto de perfil increible!`, false, true)
 		return updateThisUser;
 	} catch (error) {
 		console.error('Error during profile picture upload:', error);

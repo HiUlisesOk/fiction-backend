@@ -16,6 +16,10 @@ module.exports = (sequelize) => {
 				allowNull: false,
 				defaultValue: "user",
 			},
+			value: {
+				type: DataTypes.INTEGER,
+				allowNull: false,
+			},
 		},
 		{
 			paranoid: true,
