@@ -89,11 +89,11 @@ async function userRestrict(req, res, next) {
 			return res.status(401).json({ error: '⛔ 🪪 Acceso no autorizado, el usuario no existe en la base de datos' });
 		}
 
-		const requestedUserID = req.body.authorID || req.body.userID || req.body.UserID || req.params.id || req.params.ID || req.body.id || req.body.ID || null;
+		const requestedUserID = req.body.authorID || req.body.userID || req.body.UserID || req.params.id || req.params.ID || req.body.id || req.body.ID || req.query.id || req.query.ID || null;
 
 		console.log('requestedUserID', requestedUserID)
 		if (Number(userID) !== Number(requestedUserID)) {
-			return res.status(403).json({ error: '⛔ 👮🏻‍♀️ Acceso no autorizado, no puedes modificar la información de otros usuarios' });
+			return res.status(403).json({ error: '⛔ 👮🏻‍♀️ Acceso no autorizado, no tienes autorización para editar o acceder a la información de otros usuarios' });
 		}
 
 		next();
