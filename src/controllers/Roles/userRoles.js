@@ -20,6 +20,8 @@ async function getRolesFromUserID(id) {
 
 	const roles = await user.getRoles();
 
+	if (!roles.length) throw new Error("No se encontraron roles para el usuario");
+
 	console.log(roles)
 	//Si la funcion no recibe nada, devuelve un error.
 	if (!roles) throw new Error("No se encontraron roles para el usuario");

@@ -19,6 +19,8 @@ const {
 	getUserByUsername,
 } = require("../../controllers/UserControllers/UserControllers");
 
+const { getRolesFromUserID } = require('../../controllers/Roles/userRoles')
+
 
 
 /**
@@ -76,6 +78,45 @@ userRouter.get("/get-user-info/:id", authenticateToken, async (req, res) => {
 		res.status(200).send(userInfo);
 	} catch (error) {
 		res.status(401).send(error.message);
+	}
+});
+
+/**
+ * @swagger
+ * /get-user-roles:
+ *   get:
+ *     tags:
+ *       - Users
+ *     summary: Obtener roles de usuario por id
+ *     description: Obtiene la información de un usuario por su id
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: query
+ *         required: true
+ *         description: Id de usuario del usuario a buscar
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: OK
+ *       400:
+ *         description: Error de solicitud inválida
+ */
+userRouter.get("/get-user-roles", authenticateToken, userRestrict, async (req, res) => {
+	try {
+		const { id } = req.query;
+
+		const userRoles = await getRolesFromUserID(id);
+
+		if (!userRoles) {
+			return res.status(404).send("Usuario no encontrado");
+		}
+
+		res.status(200).send(userRoles);
+	} catch (error) {
+		res.status(400).send(error.message);
 	}
 });
 
