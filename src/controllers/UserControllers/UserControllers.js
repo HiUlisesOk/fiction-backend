@@ -254,16 +254,15 @@ const deleteUser = async (ID) => {
 //   ||==============| Upload Image |===============ooo<>
 // Updates an user's profile picture.
 
-async function uploadProfilePicture(imagen64, ID, username, email) {
+async function uploadProfilePicture(imagen64, ID) {
 	if (!imagen64) throw new Error("Falta userScore");
-	if (!ID && !username && !email) throw new Error("Falta ID, username o email del usuario");
+	if (!ID) throw new Error("Falta ID, username o email del usuario");
 
 
 	const matchingUser = await User.findOne({
 		where: {
-			[Op.or]: [{ email: email }, { username: username }, { ID: ID }],
-		},
-		attributes: ['email', 'password'],
+			ID: ID
+		}
 	});
 
 	if (!matchingUser) throw new Error("El usuario no existe");
@@ -274,7 +273,7 @@ async function uploadProfilePicture(imagen64, ID, username, email) {
 		try {
 			link = await uploadImage(imagen64);
 		} catch (uploadError) {
-			console.error('Error during image upload:', uploadError);
+			console.log('Error during image upload:', uploadError);
 			throw new Error("Error al cargar la imagen");
 		}
 
@@ -287,12 +286,14 @@ async function uploadProfilePicture(imagen64, ID, username, email) {
 			},
 			{
 				where: {
-					[Op.or]: [{ email: email }, { username: username }, { ID: ID }],
+					ID: ID
 				},
 			}
 		);
 
-		addLog(1, ID, null, `${username} ahora tiene una foto de perfil increible!`, false, true)
+		if (!updateThisUser) throw new Error("Error al actualizar la imagen de perfil");
+
+		addLog(1, Number(ID), null, `${matchingUser?.username} ahora tiene una foto de perfil increible!`, false, true)
 		return updateThisUser;
 	} catch (error) {
 		console.error('Error during profile picture upload:', error);
