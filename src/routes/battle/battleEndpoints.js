@@ -7,7 +7,7 @@
 
 const { Router } = require("express");
 const battleRouter = Router();
-const { authenticateToken } = require('../../utils/Auth');
+const { authenticateToken, userRestrict } = require('../../utils/Auth');
 const {
 	getBattleById,
 	getBattleStatsById,

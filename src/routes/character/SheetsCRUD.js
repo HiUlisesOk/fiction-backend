@@ -7,7 +7,7 @@
 
 const { Router } = require("express");
 const sheetRouter = Router();
-const { authenticateToken } = require('../../utils/Auth');
+const { authenticateToken, userRestrict } = require('../../utils/Auth');
 const {
 	getAllSheets, getSheetsById, createSheets, updateSheet, deleteSheet, getSheetByCharId
 } = require("../../controllers/CharacterControllers/SheetsControllers");
@@ -111,12 +111,16 @@ sheetRouter.get("/get-sheet-getSheetByCharId/:id", authenticateToken, async (req
  *       - Roleplay Sheets
  *     summary: Crear una nueva ficha de rol
  *     description: Crea una nueva ficha de rol con los datos proporcionados
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       content:
  *         application/json:
  *           schema:
  *             type: object
  *             properties:
+ *               userID:
+ *                 type: integer
  *               realAge:
  *                 type: number
  *               fisicalAge:
@@ -142,6 +146,7 @@ sheetRouter.get("/get-sheet-getSheetByCharId/:id", authenticateToken, async (req
  *               CharacterID:
  *                 type: integer
  *             required:
+ *               - userID
  *               - realAge
  *               - fisicalAge
  *               - sexOrientation
@@ -160,7 +165,7 @@ sheetRouter.get("/get-sheet-getSheetByCharId/:id", authenticateToken, async (req
  *       400:
  *         description: Error de solicitud inválida
  */
-sheetRouter.post("/create-sheet", async (req, res) => {
+sheetRouter.post("/create-sheet", authenticateToken, userRestrict, async (req, res) => {
 	try {
 		const {
 			realAge,
@@ -213,6 +218,8 @@ sheetRouter.post("/create-sheet", async (req, res) => {
  *           schema:
  *             type: object
  *             properties:
+ *               userID:
+ *                 type: number
  *               ID:
  *                 type: number
  *               realAge:
@@ -238,6 +245,7 @@ sheetRouter.post("/create-sheet", async (req, res) => {
  *               Psicology:
  *                 type: string
  *             required:
+ *               - userID
  *               - ID
  *               - realAge
  *               - fisicalAge
@@ -256,7 +264,7 @@ sheetRouter.post("/create-sheet", async (req, res) => {
  *       400:
  *         description: Error de solicitud inválida
  */
-sheetRouter.put("/update-sheet", authenticateToken, async (req, res) => {
+sheetRouter.put("/update-sheet", authenticateToken, userRestrict, async (req, res) => {
 	try {
 		const {
 			ID,
@@ -305,6 +313,12 @@ sheetRouter.put("/update-sheet", authenticateToken, async (req, res) => {
  *       - bearerAuth: []
  *     parameters:
  *       - in: query
+ *         name: userID
+ *         description: ID de la ficha de rol a eliminar
+ *         required: true
+ *         schema:
+ *           type: number
+ *       - in: query
  *         name: ID
  *         description: ID de la ficha de rol a eliminar
  *         required: true
@@ -316,7 +330,7 @@ sheetRouter.put("/update-sheet", authenticateToken, async (req, res) => {
  *       400:
  *         description: Error de solicitud inválida
  */
-sheetRouter.delete("/delete-sheet", authenticateToken, async (req, res) => {
+sheetRouter.delete("/delete-sheet", authenticateToken, userRestrict, async (req, res) => {
 	try {
 		const { ID } = req.query;
 

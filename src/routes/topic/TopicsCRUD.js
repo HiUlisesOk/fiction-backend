@@ -7,7 +7,7 @@
 
 const { Router } = require("express");
 const TopicRouter = Router();
-const { authenticateToken } = require('../../utils/Auth');
+const { authenticateToken, userRestrict } = require('../../utils/Auth');
 const {
 	CreateTopic,
 	getAllTopicsFromDb,
@@ -15,7 +15,7 @@ const {
 	getTopicsByUserId,
 	getLastActiveTopics,
 	updateTopic,
-	deleteTopic
+	deleteTopic,
 } = require("../../controllers/UserControllers/TopicsControllers");
 
 /**
@@ -142,6 +142,8 @@ TopicRouter.get("/getLastActiveTopics", authenticateToken, async (req, res) => {
  *       - Topics
  *     summary: Crear un nuevo tema
  *     description: Crea un nuevo tema con el título, el autor y el contenido proporcionados
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       content:
  *         application/json:
@@ -164,7 +166,7 @@ TopicRouter.get("/getLastActiveTopics", authenticateToken, async (req, res) => {
  *       400:
  *         description: Error de solicitud inválida
  */
-TopicRouter.post("/create-topic", async (req, res) => {
+TopicRouter.post("/create-topic", authenticateToken, userRestrict, async (req, res) => {
 	try {
 		const { title, authorID, content } = req.body;
 		const user = await CreateTopic(title, authorID, content);
@@ -206,7 +208,7 @@ TopicRouter.post("/create-topic", async (req, res) => {
  *       400:
  *         description: Error de solicitud inválida
  */
-TopicRouter.put("/update-topic", authenticateToken, async (req, res) => {
+TopicRouter.put("/update-topic", authenticateToken, userRestrict, async (req, res) => {
 	try {
 		const { authorID, topicID, title } = req.body;
 		const user = await updateTopic(authorID, topicID, title);
@@ -239,7 +241,7 @@ TopicRouter.put("/update-topic", authenticateToken, async (req, res) => {
  *       400:
  *         description: Error de solicitud inválida
  */
-TopicRouter.delete("/delete-topic", authenticateToken, async (req, res) => {
+TopicRouter.delete("/delete-topic", authenticateToken, userRestrict, async (req, res) => {
 	try {
 		const { ID } = req.query;
 		const user = await deleteTopic(ID);

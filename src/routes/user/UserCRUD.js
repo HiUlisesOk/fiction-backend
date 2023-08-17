@@ -7,7 +7,7 @@
 
 const { Router } = require("express");
 const userRouter = Router();
-const { authenticateToken, isAdmin } = require('../../utils/Auth');
+const { authenticateToken, isAdmin, userRestrict } = require('../../utils/Auth');
 const {
 	getAllUsersFromDb,
 	createUser,
@@ -171,7 +171,7 @@ userRouter.post("/create-user", async (req, res) => {
 /**
  * @swagger
  * /update-profilePicture:
- *   put:
+ *   post:
  *     tags:
  *       - Users
  *     summary: Actualizar la imagen de perfil de un usuario
@@ -188,36 +188,27 @@ userRouter.post("/create-user", async (req, res) => {
  *                 type: string
  *               ID:
  *                 type: integer
- *               username:
- *                 type: string
- *               email:
- *                 type: string
  *             required:
  *               - imagen64
  *               - ID
- *               - username
- *               - email
  *     responses:
  *       200:
  *         description: OK
  *       400:
  *         description: Error de solicitud inválida
  */
-userRouter.put("/update-profilePicture", authenticateToken, async (req, res) => {
+userRouter.post("/update-profilePicture", authenticateToken, userRestrict, async (req, res) => {
 	try {
 		const {
 			imagen64,
 			ID,
-			username,
-			email,
 		} = req.body;
 
 		const profilePic = await uploadProfilePicture(
 			imagen64,
 			ID,
-			username,
-			email,
 		);
+		if (!profilePic) throw new Error("Error al actualizar la imagen de perfil");
 		res.status(200).send(profilePic);
 	} catch (error) {
 		res.status(400).send(error.message);
@@ -273,7 +264,7 @@ userRouter.put("/update-profilePicture", authenticateToken, async (req, res) => 
  *       400:
  *         description: Error de solicitud inválida
  */
-userRouter.put("/update-user", authenticateToken, async (req, res) => {
+userRouter.put("/update-user", authenticateToken, userRestrict, async (req, res) => {
 	try {
 		const {
 			ID,

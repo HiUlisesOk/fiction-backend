@@ -6,7 +6,7 @@
  */
 const { Router } = require("express");
 const postRouter = Router();
-const { authenticateToken } = require('../../utils/Auth');
+const { authenticateToken, userRestrict } = require('../../utils/Auth');
 const {
 	createPost,
 	getAllPostFromDb,
@@ -173,7 +173,7 @@ postRouter.get("/get-post-byUserId", authenticateToken, async (req, res) => {
  *       400:
  *         description: Error de solicitud inválida
  */
-postRouter.post("/create-post", authenticateToken, async (req, res) => {
+postRouter.post("/create-post", authenticateToken, userRestrict, async (req, res) => {
 	try {
 		const { content, authorID, topicID } = req.body;
 		const post = await createPost(content, authorID, topicID);

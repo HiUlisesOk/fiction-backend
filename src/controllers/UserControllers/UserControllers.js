@@ -10,7 +10,15 @@ const { User, Post, Topic, Roles } = require("../../db");
 const { generateDateOnly, generateDateTime } = require('../../utils/date')
 const bcrypt = require('bcrypt');
 const { uploadImage } = require('../imagesControllers')
-const { getRolesFromUserID, addRol } = require("../../controllers/Roles/userRoles");
+const {
+	getRolesFromUserID,
+	addRol,
+	userHasRole,
+	rolExist,
+	createRol
+} = require("../../controllers/Roles/userRoles");
+
+const { getAllLogs, addLog } = require('../Logs/LogsControllers')
 
 /// <=============== controller getAllUsers ===============>
 async function getAllUsersFromDb() {
@@ -101,10 +109,18 @@ async function createUser(
 		await user.addTopic(topic);
 		await post.setTopic(topic);
 
+		const rolVerify = await rolExist('user', 1)
+
+		if (!rolVerify) {
+			const rol = await createRol('user', 1)
+			if (!rol) throw new Error("El rol no pudo ser creado");
+		}
 
 		const AddRoleToUser = await addRol(1, user.ID)
 
 		if (!AddRoleToUser) throw new Error("El rol no pudo ser asignado");
+
+		addLog(1, user.ID, null, `${username} se ha unido a nosotros`, false, true)
 
 		return { message: `El usuario ${username} ha sido creado correctamente`, type: true };
 	} catch (error) {
@@ -238,16 +254,15 @@ const deleteUser = async (ID) => {
 //   ||==============| Upload Image |===============ooo<>
 // Updates an user's profile picture.
 
-async function uploadProfilePicture(imagen64, ID, username, email) {
+async function uploadProfilePicture(imagen64, ID) {
 	if (!imagen64) throw new Error("Falta userScore");
-	if (!ID && !username && !email) throw new Error("Falta ID, username o email del usuario");
+	if (!ID) throw new Error("Falta ID, username o email del usuario");
 
 
 	const matchingUser = await User.findOne({
 		where: {
-			[Op.or]: [{ email: email }, { username: username }, { ID: ID }],
-		},
-		attributes: ['email', 'password'],
+			ID: ID
+		}
 	});
 
 	if (!matchingUser) throw new Error("El usuario no existe");
@@ -258,7 +273,7 @@ async function uploadProfilePicture(imagen64, ID, username, email) {
 		try {
 			link = await uploadImage(imagen64);
 		} catch (uploadError) {
-			console.error('Error during image upload:', uploadError);
+			console.log('Error during image upload:', uploadError);
 			throw new Error("Error al cargar la imagen");
 		}
 
@@ -271,11 +286,14 @@ async function uploadProfilePicture(imagen64, ID, username, email) {
 			},
 			{
 				where: {
-					[Op.or]: [{ email: email }, { username: username }, { ID: ID }],
+					ID: ID
 				},
 			}
 		);
 
+		if (!updateThisUser) throw new Error("Error al actualizar la imagen de perfil");
+
+		addLog(1, Number(ID), null, `${matchingUser?.username} ahora tiene una foto de perfil increible!`, false, true)
 		return updateThisUser;
 	} catch (error) {
 		console.error('Error during profile picture upload:', error);

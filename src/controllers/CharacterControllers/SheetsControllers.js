@@ -9,7 +9,8 @@ const { Op } = require("sequelize");
 const { User, Post, Topic, Character, CharacterStats, Character_Info } = require("../../db");
 const { generateDateOnly, generateDateTime } = require('../../utils/date')
 const bcrypt = require('bcrypt');
-const { uploadImage } = require('../imagesControllers')
+const { uploadImage } = require('../imagesControllers');
+const { addLog } = require("../Logs/LogsControllers");
 
 
 /// <=============== controller getAllCharacters ===============>
@@ -86,7 +87,7 @@ async function createSheets(
 			},
 		});
 
-		if (!sheetCreated) throw new Error("La ficha no pudo ser creada.");
+		if (!sheetCreated) throw new Error("📄 Este personaje ya tiene una ficha de rol.");
 
 		const matchingCharacter = await Character.findOne({
 			where: {
@@ -94,14 +95,15 @@ async function createSheets(
 			},
 		});
 
-		if (!matchingCharacter) throw new Error("El CharacterID no es válido o no existe.");
+		if (!matchingCharacter) throw new Error("🔍 El CharacterID no es válido o no existe.");
 
 		await matchingCharacter.setCharacter_Info(sheet);
 
+		addLog(2, matchingCharacter.ID, null, `${matchingCharacter.name} ha creado su ficha de rol!`, false, true)
 
-		return { message: `La ficha del personaje ${matchingCharacter.name} ha sido creada correctamente.`, type: true, sheet: sheet, character: matchingCharacter };
+		return { message: `👌 La ficha del personaje ${matchingCharacter.name} ha sido creada correctamente.`, type: true, sheet: sheet, character: matchingCharacter };
 	} catch (error) {
-		throw new Error("Error al crear la ficha de rol del personaje. " + error.message);
+		throw new Error("❌ " + error.message);
 	}
 }
 
