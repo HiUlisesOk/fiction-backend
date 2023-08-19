@@ -228,7 +228,19 @@ const AuthLogin = async (email, password) => {
 		// console.log('Password from DB:', user.password);
 		// console.log('Passwords match:', passwordsMatch);
 
-		return { passwordsMatch, user: { ID: user.ID, username: user.username, firstName: user.firstName } };
+		const roles = await user.getRoles();
+
+		if (!roles.length) throw new Error("No se encontraron roles para el usuario");
+
+		console.log(roles)
+		const mapRoles = roles.map((role) => {
+			return {
+				rolename: role.rolename,
+				value: role.value,
+			};
+		});
+
+		return { passwordsMatch, user: { ID: user.ID, username: user.username, firstName: user.firstName, roles: mapRoles } };
 	} catch (error) {
 		return 'Authentication error: ' + error.message;
 	}
