@@ -104,9 +104,39 @@ async function userRestrict(req, res, next) {
 
 
 
+async function charRestrict(req, res, next) {
+	try {
+		const authUser = req.user;
+		if (!authUser || !authUser.id) {
+			return res.status(401).json({ error: '⛔ 👮🏻‍♀️ Acceso no autorizado, no existen credenciales de autorización de administrador' });
+		}
+
+		const userID = authUser.id;
+		const requestedUserID = req.body.authorID || req.body.userID || req.body.UserID || req.query.userID || req.params.id || req.params.ID || req.body.id || req.body.ID || req.query.id || req.query.ID || null;
+		console.log(requestedUserID, userID)
+		if (Number(userID) !== Number(requestedUserID)) {
+			return res.status(403).json({ error: '⛔ 👮🏻‍♀️ Acceso no autorizado, no tienes autorización para editar o acceder a la información de otros usuarios' });
+		}
+
+		const user = await getUserFromDb(userID);
+		if (!user) {
+			return res.status(401).json({ error: '⛔ 🪪 Acceso no autorizado, el usuario no existe en la base de datos' });
+		}
+
+		req.userID = userID; // Agregar el ID del usuario a la solicitud
+		next();
+	} catch (error) {
+		return res.status(401).json({ error: `⛔ 😶‍🌫️ Acceso no autorizado, ${error.message}` });
+	}
+}
+
+module.exports = userRestrict;
 
 
-module.exports = { authenticateToken, isAdmin, userRestrict };
+
+
+
+module.exports = { authenticateToken, isAdmin, userRestrict, charRestrict };
 
 
 

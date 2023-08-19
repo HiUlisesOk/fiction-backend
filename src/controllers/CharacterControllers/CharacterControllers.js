@@ -131,8 +131,8 @@ async function createCharacter(
 		await matchingUser.addCharacter(character);
 		await stats.setCharacter(character);
 		// await character.setStats(stats);
-
-		addLog(2, matchingCharacter.ID, null, `${matchingCharacter.name} ahora tiene una foto de perfil increible!`, false, true)
+		console.log('**/->ESTAMOS ACÁ<-/**')
+		addLog(2, matchingCharacter?.ID, null, `${matchingCharacter?.name} ahora tiene una foto de perfil increible!`, false, true)
 		return { message: `El personaje ${name} ha sido creado correctamente`, type: true, character: character, stats: stats };
 	} catch (error) {
 		throw new Error("Error al crear el usuario: " + error.message);
