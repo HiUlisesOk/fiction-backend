@@ -100,7 +100,7 @@ async function startBattle(CharID, objectiveID, actionType) {
 
   const BattleID = battle.ID;
 
-  const battleTurn = await takeTurn(CharID, BattleID, actionType, 0, objectiveID, 1)
+  const battleTurn = await takeTurn(CharID, BattleID, actionType, 0, objectiveID, 1);
 
   if (!battleTurn || !BattleID) throw new Error("El battleTurn no es válido o no existe.");
 
@@ -113,14 +113,14 @@ async function startBattle(CharID, objectiveID, actionType) {
 
 async function takeTurn(CharID, BattleID, actionType, actionType2, objectiveID, isFirstTurn = 0) {
   // Validar los parámetros de entrada
-  if ((Number(actionType) === 1 || Number(actionType) === 2 || Number(actionType) === 4) && CharID === objectiveID) throw new Error("No puedes atacarte a ti mismo.")
-  if ((Number(actionType2) === 1 || Number(actionType2) === 2 || Number(actionType2) === 4) && CharID === objectiveID) throw new Error("No puedes atacarte a ti mismo.")
-  if (!CharID) throw new Error("El CharID no es válido o no existe.")
-  if (!actionType) throw new Error("El action 1 no existe.")
-  if (!objectiveID) throw new Error("El objectiveID no es válido o no existe.")
+  if ((Number(actionType) === 1 || Number(actionType) === 2 || Number(actionType) === 4) && CharID === objectiveID) throw new Error("No puedes atacarte a ti mismo.");
+  if ((Number(actionType2) === 1 || Number(actionType2) === 2 || Number(actionType2) === 4) && CharID === objectiveID) throw new Error("No puedes atacarte a ti mismo.");
+  if (!CharID) throw new Error("El CharID no es válido o no existe.");
+  if (!actionType) throw new Error("El action 1 no existe.");
+  if (!objectiveID) throw new Error("El objectiveID no es válido o no existe.");
 
   // Definir los tipos de acción válidos
-  const battleActions = { ATK: 1, DEF: 2, HEAL: 3, ILU: 4, SKIP: 5 }
+  const battleActions = { ATK: 1, DEF: 2, HEAL: 3, ILU: 4, SKIP: 5 };
 
   // Verificar que el tipo de acción sea válido
   let isValidAction = false;
@@ -154,8 +154,8 @@ async function takeTurn(CharID, BattleID, actionType, actionType2, objectiveID, 
   //Si el personaje no está en la batalla, lo incluimos
   const CharIsInBattle = await battle.Chars;
 
-  if (!CharIsInBattle.includes(Number(CharID))) battle.update({ Chars: [...CharIsInBattle, Number(CharID)] })
-  console.log('CharIsInBattle', await battle.Chars)
+  if (!CharIsInBattle.includes(Number(CharID))) battle.update({ Chars: [...CharIsInBattle, Number(CharID)] });
+  console.log('CharIsInBattle', await battle.Chars);
   // Obtener la ronda actual (Las rondas están en desuso actualmente y no cumplen función alguna)
   const battleRound = await BattleRounds.findOne({
     where: {
@@ -235,15 +235,15 @@ async function takeTurn(CharID, BattleID, actionType, actionType2, objectiveID, 
       // console.log('actionType: ', actionType, battleActions, turnAction)
       break;
     case battleActions.DEF:
-      if (opponentTurn?.atk === null || opponentTurn?.atk === undefined || opponentTurn?.atk === false || !opponentTurn?.atk) { turnAction = { ...turnAction, def: 0 } }
+      if (opponentTurn?.atk === null || opponentTurn?.atk === undefined || opponentTurn?.atk === false || !opponentTurn?.atk) { turnAction = { ...turnAction, def: 0 }; }
       else {
-        turnAction = { ...turnAction, def: battleStats.RES + rollDice(battleStats.diceValue) }
+        turnAction = { ...turnAction, def: battleStats.RES + rollDice(battleStats.diceValue) };
       }
 
       break;
     case battleActions.HEAL:
       turnAction = { ...turnAction, heal: battleStats.WIS + battleStats.RES + rollDice(battleStats.diceValue) + battleStats.INT };
-      console.log('actionType: ', actionType, battleActions, turnAction, 'battleStats.HEAL ====>', battleStats)
+      console.log('actionType: ', actionType, battleActions, turnAction, 'battleStats.HEAL ====>', battleStats);
       break;
     case battleActions.ILU:
       turnAction = { ...turnAction, ilu: battleStats.WIS + battleStats.CHARM + rollDice(battleStats.diceValue) + battleStats.INT };
@@ -265,15 +265,15 @@ async function takeTurn(CharID, BattleID, actionType, actionType2, objectiveID, 
       // console.log('actionType2: ', actionType2, battleActions, turnAction2)
       break;
     case battleActions.DEF:
-      if (opponentTurn?.atk === null || opponentTurn?.atk === undefined || opponentTurn?.atk === false || !opponentTurn?.atk) { turnAction2 = { ...turnAction2, def: 0 } }
+      if (opponentTurn?.atk === null || opponentTurn?.atk === undefined || opponentTurn?.atk === false || !opponentTurn?.atk) { turnAction2 = { ...turnAction2, def: 0 }; }
       else {
-        turnAction2 = { ...turnAction2, def: battleStats.RES + rollDice(battleStats.diceValue) }
+        turnAction2 = { ...turnAction2, def: battleStats.RES + rollDice(battleStats.diceValue) };
       }
 
       break;
     case battleActions.HEAL:
       turnAction2 = { ...turnAction2, heal: battleStats.WIS + battleStats.RES + rollDice(battleStats.diceValue) + battleStats.INT };
-      console.log('actionType2: ', actionType2, battleActions, turnAction2, 'battleStats.HEAL ====>', battleStats)
+      console.log('actionType2: ', actionType2, battleActions, turnAction2, 'battleStats.HEAL ====>', battleStats);
       break;
     case battleActions.ILU:
       turnAction2 = { ...turnAction2, ilu: battleStats.WIS + battleStats.CHARM + rollDice(battleStats.diceValue) + battleStats.INT };
@@ -306,7 +306,7 @@ async function takeTurn(CharID, BattleID, actionType, actionType2, objectiveID, 
   const newAtk = turnAction?.atk + turnAction2?.atk;
   const newHeal = turnAction?.heal + turnAction2?.heal;
   const newIlu = turnAction?.ilu + turnAction2?.ilu;
-  console.log('PrevHP: ', prevHP, 'NewHP: ', newHp, 'opponentTurnAtk: ', opponentTurn?.atk, 'turnAction: ', newDef, newAtk, newHeal, newIlu)
+  console.log('PrevHP: ', prevHP, 'NewHP: ', newHp, 'opponentTurnAtk: ', opponentTurn?.atk, 'turnAction: ', newDef, newAtk, newHeal, newIlu);
 
   const battleTurn = await BattleTurn.create({
     CharID: CharID,
@@ -333,8 +333,8 @@ async function takeTurn(CharID, BattleID, actionType, actionType2, objectiveID, 
         TurnResolved: false, // La condición para encontrar el turno a actualizar
       }
     }
-  )
-  console.log('battleTurn.currentHP', battleTurn.currentHP, 'battleStats.HP', battleStats.HP, 'newHp', newHp)
+  );
+  console.log('battleTurn.currentHP', battleTurn.currentHP, 'battleStats.HP', battleStats.HP, 'newHp', newHp);
   // Comprobamos si el personaje ha muerto
   if (battleTurn.currentHP <= 0) {
     battleTurn.update(
@@ -347,7 +347,7 @@ async function takeTurn(CharID, BattleID, actionType, actionType2, objectiveID, 
           TurnResolved: false, // La condición para encontrar el turno a actualizar
         }
       }
-    )
+    );
     battle.update(
       { WinnerID: objectiveID, LoserID: CharID }, // Los campos y sus nuevos valores a actualizar
       {
@@ -356,7 +356,7 @@ async function takeTurn(CharID, BattleID, actionType, actionType2, objectiveID, 
           WinnerID: null, // La condición para encontrar el turno a actualizar
         }
       }
-    )
+    );
   }
   // Asociaciones
   await battleRound.addBattleTurn(battleTurn);
@@ -386,6 +386,8 @@ async function takeTurn(CharID, BattleID, actionType, actionType2, objectiveID, 
       heal: newHeal || 0,
       ilu: newIlu || 0,
       counter: newCounter || 0,
+      action1: actionType || '',
+      action2: actionType2 || '',
     },
   };
 }
@@ -393,7 +395,7 @@ async function takeTurn(CharID, BattleID, actionType, actionType2, objectiveID, 
 async function getAllBattles() {
   const allBattles = await Battle.findAll();
 
-  if (!allBattles) throw new Error('No hay batallas registradas.')
+  if (!allBattles) throw new Error('No hay batallas registradas.');
 
   return allBattles;
 }
@@ -401,7 +403,7 @@ async function getAllBattles() {
 async function getBattleById(id) {
   const BattleById = await Battle.findOne({ where: { ID: id }, include: [BattleStats] });
 
-  if (!BattleById) throw new Error('La batalla no existe o no pudo ser econtrada.')
+  if (!BattleById) throw new Error('La batalla no existe o no pudo ser econtrada.');
 
   return BattleById;
 }
@@ -409,15 +411,15 @@ async function getBattleById(id) {
 async function getBattleStatsById(id) {
   const battleStats = await BattleStats.findByPk(id);
 
-  if (!battleStats) throw new Error('Las estadísticas de batalla no existen o no pudieron ser econtradas.')
+  if (!battleStats) throw new Error('Las estadísticas de batalla no existen o no pudieron ser econtradas.');
 
   return battleStats;
 }
 
 async function getBattleByCharacterId(id) {
-  const battleStats = await battleStats.findOne({ where: { charID: id } })
+  const battleStats = await battleStats.findOne({ where: { charID: id } });
 
-  if (!battleStats) throw new Error('Las estadísticas de batalla no existen o no pudieron ser econtradas con este id.')
+  if (!battleStats) throw new Error('Las estadísticas de batalla no existen o no pudieron ser econtradas con este id.');
 
   return battleStats;
 }
