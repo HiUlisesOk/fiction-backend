@@ -23,9 +23,16 @@ async function getRolesFromUserID(id) {
 	if (!roles.length) throw new Error("No se encontraron roles para el usuario");
 
 	console.log(roles)
+	const mapRoles = roles.map((role) => {
+		return {
+			rolename: role.rolename,
+			value: role.value,
+		};
+	});
 	//Si la funcion no recibe nada, devuelve un error.
-	if (!roles) throw new Error("No se encontraron roles para el usuario");
-	return roles;
+	if (!roles) throw new Error("🔍 No se encontraron roles para el usuario");
+	if (!mapRoles) throw new Error("👷🏻 - No se pudieron integrar las propiedades de los roles en un array");
+	return mapRoles;
 }
 
 /// <=============== controller User has Role ===============>

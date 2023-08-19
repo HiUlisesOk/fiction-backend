@@ -7,7 +7,7 @@
 
 const { Router } = require("express");
 const characterRouter = Router();
-const { authenticateToken, isAdmin, userRestrict } = require('../../utils/Auth');
+const { authenticateToken, isAdmin, charRestrict, userRestrict } = require('../../utils/Auth');
 const {
 	getAllCharacters,
 	getCharacterById,
@@ -74,7 +74,7 @@ characterRouter.get("/get-character-info", authenticateToken, async (req, res) =
 	try {
 		const characterID = req.query.id;
 		const characterInfo = await getCharacterById(characterID);
-		res.status(200).send(characterInfo);
+		res.status(200).send({ ...characterInfo, message: 'OK' });
 	} catch (error) {
 		res.status(401).send(error.message);
 	}
@@ -337,12 +337,12 @@ characterRouter.put("/update-character", authenticateToken, userRestrict, async 
  *         description: Error de solicitud inválida
  */
 
-characterRouter.delete("/delete-character", authenticateToken, userRestrict, async (req, res) => {
+characterRouter.delete("/delete-character", authenticateToken, charRestrict, async (req, res) => {
 	try {
 		const { ID } = req.query;
 
 		const character = await deleteCharacter(ID);
-		res.status(200).send(character);
+		res.status(200).send({ character, message: 'OK' });
 	} catch (error) {
 		res.status(400).send(error.message);
 	}
