@@ -107,7 +107,7 @@ async function startBattle(CharID, objectiveID, actionType) {
   // await battleRound.addBattleTurn(battleTurn);
 
   // console.log(await battle.getCharacters())
-  return battle;
+  return { battle, battleTurn };
 
 }
 
