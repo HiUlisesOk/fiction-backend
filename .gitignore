@@ -108,3 +108,4 @@ package-lock.json
 # global variables
 .env
 env
+*.env
