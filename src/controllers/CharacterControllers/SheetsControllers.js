@@ -99,7 +99,8 @@ async function createSheets(
 
 		await matchingCharacter.setCharacter_Info(sheet);
 
-		addLog(2, matchingCharacter.ID, null, `${matchingCharacter.name} ha creado su ficha de rol!`, false, true)
+
+		addLog(2, matchingCharacter.ID, null, `${matchingCharacter.name} ha creado su ficha de rol!`, false, true, 'Character role sheet created', matchingCharacter.name)
 
 		return { message: `👌 La ficha del personaje ${matchingCharacter.name} ha sido creada correctamente.`, type: true, sheet: sheet, character: matchingCharacter };
 	} catch (error) {

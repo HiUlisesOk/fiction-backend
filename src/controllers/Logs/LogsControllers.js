@@ -24,64 +24,57 @@ const { uploadImage } = require('../imagesControllers')
 
 const { rollDice } = require("../../utils/rollDice");
 
-/// <=============== controller getAllUsers ===============>
+/// <=============== controller getAllLogs ===============>
 async function getAllLogs() {
 	const log = await ActionLog.findAll();
 	//Si la funcion no recibe nada, devuelve un error.
-	if (!log) throw new Error("No se encontraron usuarios");
+	if (!log) throw new Error("No se encontraron logs");
+
+	return log;
+}
+
+/// <=============== controller getAllUsers ===============>
+async function getLastLogs() {
+	const log = await ActionLog.findAll({
+		limit: 15, // Obtener solo los últimos 15 registros
+		order: [['createdAt', 'DESC']], // Ordenar por fecha de creación de manera descendente
+	});
+	//Si la funcion no recibe nada, devuelve un error.
+	if (!log) throw new Error("No se encontraron logs");
+
 	return log;
 }
 
 /// <=============== controller getAllUsers ===============>
 // action_type:
-// 1 = User
-// 2 = Character
-// addLog(1, ID, null, `${username} ahora tiene una foto de perfil increible!`, false, true)
-async function addLog(action_type, userID, target_id, info, onlyAdmins, isActive) {
 
-	if (action_type === 1) {
-		const user = await User.findOne({ were: { ID: userID } })
+// addLog(1, ID, characterID, `${username} ahora tiene una foto de perfil increible!`, false, true,'Profile picture updated', username )
+async function addLog(action_type, ID, target_id, info, onlyAdmins, isActive, action_desc, name) {
 
-		const log = await ActionLog.create({
-			user_id: userID || null,
-			action_type: action_type || null,
-			target_id: target_id || null,
-			avatar: user.avatar || null,
-			info: info || null,
-			onlyAdmins: onlyAdmins || null,
-			isActive: isActive || null,
-		}
-		);
-	} else if (action_type === 2) {
-		const character = await Character.findOne({ were: { ID: userID } })
-
-		const log = await ActionLog.create({
-			user_id: userID || null,
-			action_type: action_type || null,
-			target_id: target_id || null,
-			avatar: character.avatar || null,
-			info: info || null,
-			onlyAdmins: onlyAdmins || null,
-			isActive: isActive || null,
-		}
-		);
+	console.log(ID)
+	const user = await User.findOne({ where: { ID: ID } })
+	if (!user) throw new Error('No username')
+	console.log(user)
+	const log = await ActionLog.create({
+		user_id: ID || null,
+		name: name || user.username || null,
+		action_type: action_type || null,
+		action_desc: action_desc || null,
+		target_id: target_id || ID,
+		avatar: user?.profilePicture || null,
+		info: info || null,
+		onlyAdmins: onlyAdmins || false,
+		isActive: isActive || null,
 	}
+	);
+
+	return log;
 }
 
-// /// <=============== controller getUSER ===============>
-// async function getUserFromDb(userID) {
-// 	const matchingUser = await User.findOne({
-// 		where: {
-// 			ID: userID,
-// 		},
-// 	});
 
-// 	if (!matchingUser) throw new Error("El usuario no existe");
-// 	//Si la funcion no recibe nada, devuelve un error.
-// 	return matchingUser;
-// }
 
 module.exports = {
 	getAllLogs,
+	getLastLogs,
 	addLog,
 };

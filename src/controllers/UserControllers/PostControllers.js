@@ -9,6 +9,8 @@ const { Op } = require("sequelize");
 const { User, Post, Topic } = require("../../db");
 const { generateDateOnly, generateDateTime } = require("../../utils/date");
 const bcrypt = require("bcrypt");
+const { addLog } = require("../Logs/LogsControllers");
+const { getUserFromDb } = require("./UserControllers");
 
 /// <=============== GET ALL POST ===============>
 async function getAllPostFromDb() {
@@ -21,7 +23,7 @@ async function getAllPostFromDb() {
 
 /// <=============== controller getPostById ===============>
 async function getPostById(id) {
-  if (!id) throw new Error("No se recibió un Post en el payload");
+  if (!id) throw new Error("No se recibió un Post ID en el payload");
 
   const post = await Post.findByPk(id);
   if (!post) throw new Error("Post not Found");
@@ -91,7 +93,7 @@ const createPost = async (
     content: content,
     topicID: topic.ID,
   };
-
+  await addLog(1, user.ID, null, `${user.username} ha posteado en ${topic.title}`, false, true, 'New Topic', user.username)
   return newPost;
 };
 
@@ -118,7 +120,7 @@ const updatePost = async (
   const updatedPost = await matchingPost.update({
     content: content,
   });
-
+  await addLog(1, authorID, null, `${matchingUser?.username} editó su post ${postID} en el topic ${topicID}`, false, true, 'Post Updated', matchingUser?.username)
   return updatedPost;
 };
 
@@ -126,12 +128,17 @@ const updatePost = async (
 
 const deletePost = async (authorID) => {
   const post = await Post.findByPk(authorID);
+  const user = await getUserFromDb(post.authorID)
+  console.log('user: ', user, post.authorID)
   await post.destroy({
     where: {
       ID: authorID,
     },
   });
-
+  if (!user) throw new Error("No user ID");
+  const log = await addLog(1, post.authorID, null, `${user.username} ha borrado el post Nro ${post.topicID}`, true, true, 'Post Deleted', user?.username)
+  if (!log) throw new Error("No log");
+  console.log(log)
   return post;
 };
 

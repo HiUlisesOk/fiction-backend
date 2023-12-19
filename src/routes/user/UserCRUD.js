@@ -17,6 +17,7 @@ const {
 	uploadProfilePicture,
 	getUserFromDb,
 	getUserByUsername,
+	getMostActiveUsers,
 } = require("../../controllers/UserControllers/UserControllers");
 
 const { getRolesFromUserID } = require('../../controllers/Roles/userRoles')
@@ -77,7 +78,7 @@ userRouter.get("/get-user-info/:id", authenticateToken, async (req, res) => {
 		const userInfo = await getUserFromDb(userID);
 		res.status(200).send(userInfo);
 	} catch (error) {
-		res.status(401).send(error.message);
+		res.status(401).send({ message: error.message, code: 401 });
 	}
 });
 
@@ -370,4 +371,29 @@ userRouter.delete("/delete-user", authenticateToken, isAdmin, async (req, res) =
 	}
 });
 
+
+/**
+ * @swagger
+ * /get-most-active-users:
+ *   get:
+ *     tags:
+ *       - Users
+ *     summary: Obtener los 8 usuarios con mas actividad
+ *     description: Obtiene una lista de 8 usuarios mas activos
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: OK
+ *       401:
+ *         description: Error de autenticación
+ */
+userRouter.get("/get-most-active-users", authenticateToken, async (req, res) => {
+	try {
+		const userList = await getMostActiveUsers();
+		res.status(200).send(userList);
+	} catch (error) {
+		res.status(401).send(error.message);
+	}
+});
 module.exports = userRouter;

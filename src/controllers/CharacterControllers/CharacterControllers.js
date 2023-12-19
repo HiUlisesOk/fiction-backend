@@ -6,7 +6,7 @@
 //         \|  
 
 const { Op } = require("sequelize");
-const { User, Post, Topic, Character, CharacterStats } = require("../../db");
+const { User, Post, Topic, Character, CharacterStats, ActionLog } = require("../../db");
 const { generateDateOnly, generateDateTime } = require('../../utils/date')
 const bcrypt = require('bcrypt');
 const { uploadImage } = require('../imagesControllers');
@@ -131,8 +131,9 @@ async function createCharacter(
 		await matchingUser.addCharacter(character);
 		await stats.setCharacter(character);
 		// await character.setStats(stats);
-		console.log('**/->ESTAMOS ACÁ<-/**')
-		addLog(2, matchingCharacter?.ID, null, `${matchingCharacter?.name} ahora tiene una foto de perfil increible!`, false, true)
+		console.log('**/->ESTAMOS ACÁ<-/**' + userID)
+		await addLog(2, userID, character?.ID, `Acaba de dar vida a un nuevo personaje! ¡Den la bienvenida a ${character?.name} y prepárense para vivir grandes aventuras con él! 🎭📜✨`, false, true, 'Character created', matchingUser?.username)
+
 		return { message: `El personaje ${name} ha sido creado correctamente`, type: true, character: character, stats: stats };
 	} catch (error) {
 		throw new Error("Error al crear el usuario: " + error.message);

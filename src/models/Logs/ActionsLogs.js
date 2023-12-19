@@ -15,7 +15,15 @@ module.exports = (sequelize) => {
 				type: DataTypes.INTEGER,
 				allowNull: true,
 			},
+			name: {
+				type: DataTypes.STRING,
+				allowNull: true,
+			},
 			action_type: {
+				type: DataTypes.STRING,
+				allowNull: true,
+			},
+			action_desc: {
 				type: DataTypes.STRING,
 				allowNull: true,
 			},

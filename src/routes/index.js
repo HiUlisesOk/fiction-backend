@@ -12,6 +12,7 @@ const sheetRouter = require('./character/SheetsCRUD')
 const skillsRouter = require('./character/SkillsCRUD')
 const statsRouter = require('./character/StatsCRUD')
 const battleRouter = require('./battle/battleEndpoints')
+const logsRouter = require('./Logs/LogsCRUD')
 
 // Configurar los routers
 // Ejemplo: router.use('/auth', authRouter);
@@ -33,6 +34,8 @@ router.use(skillsRouter)
 router.use(statsRouter)
 
 router.use(battleRouter)
+
+router.use(logsRouter)
 
 module.exports = router;
 

@@ -26,12 +26,12 @@ const ActionLog = require('./models/Logs/ActionsLogs')(sequelize);
 const Roles = require('./models/UserModels/Roles')(sequelize);
 
 // Definimos las relaciones entre los modelos
-User.belongsToMany(Topic, { through: "UserTopics" });
+User.belongsToMany(Topic, { through: "UserTopic", foreignKey: "userID" });
 User.belongsToMany(Roles, { through: "UserRoles" });
 User.hasMany(Post);
 User.hasMany(Character);
 
-Topic.belongsToMany(User, { through: "UserTopics" });
+Topic.belongsToMany(User, { through: "UserTopic", foreignKey: "topicID" });
 Topic.hasMany(Post);
 
 Post.belongsTo(User);
@@ -93,4 +93,5 @@ module.exports = {
   ActionLog,
   Roles,
   conn: sequelize,
+  sequelize,
 };

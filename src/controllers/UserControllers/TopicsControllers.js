@@ -10,7 +10,8 @@ const { User, Post, Topic } = require("../../db");
 const { generateDateOnly, generateDateTime } = require('../../utils/date')
 const { createPost } = require('./PostControllers')
 const bcrypt = require('bcrypt');
-
+const { addLog } = require("../Logs/LogsControllers");
+const { sequelize } = require("../../db");
 
 /// <=============== controller getTopicById ===============>
 async function getTopicsById(id) {
@@ -25,9 +26,38 @@ async function getTopicsById(id) {
 async function getTopicsByUserId(userID) {
 	if (!userID) throw new Error("No se recibió un userID en el payload");
 
-	const topic = await Topic.findAll({ where: { authorID: userID } });
+	const topic = await Topic.findAll({
+		where: { authorID: userID },
+		raw: true,
+		include: [
+			{
+				model: User,
+				attributes: ['profilePicture', 'username'],
+				// where: sequelize.literal('"User"."ID" = "Topic"."authorID"'),
+				required: false,
+			},
+		],
+	});
+
 	if (!topic) throw new Error("Topic not Found");
-	return topic;
+
+	const cleanTopic = topic?.map(item => {
+		return {
+			ID: item?.ID,
+			title: item?.title,
+			author: item?.author,
+			authorID: item?.authorID,
+			postCount: item?.postCount,
+			lastAuthor: item?.lastAuthor,
+			lastAuthorID: item?.lastAuthorID,
+			createdAt: item?.createdAt,
+			updatedAt: item?.updatedAt,
+			deletedAt: item?.deletedAt,
+			avatar: item['Users.profilePicture']
+		}
+	})
+
+	return cleanTopic || topic;
 }
 
 /// <=============== controller getLastActiveTopics ===============>
@@ -46,9 +76,22 @@ async function getLastActiveTopics() {
 /// <=============== controller getAllTopicsFromDb ===============>
 async function getAllTopicsFromDb() {
 
-	const topics = await Topic.findAll();
+	const topics = await Topic.findAll({
+		raw: true,
+		include: [
+			{
+				model: User,
+				attributes: ['profilePicture', 'username'],
+				// where: sequelize.literal('"User"."ID" = "Topic"."authorID"'),
+				required: false,
+			},
+		],
+	});
 	//Si la funcion no recibe nada, devuelve un error.
+	console.log(topics.getuserID)
 	if (!topics) throw new Error("No se encontraron Topics");
+
+
 	return topics;
 }
 
@@ -76,7 +119,11 @@ const CreateTopic = async (title, authorID, content) => {
 
 	await user.addTopic(topic);
 
+	const log = await addLog(1, authorID, null, `${user.username} ha creado el topic ${topic.title}`, true, true, 'New Topic', user?.username)
+	if (!log) throw new Error("No log");
+
 	const newPost = await createPost(content, authorID, topic.dataValues.ID)
+
 
 	return { topic, newPost };
 }
@@ -100,6 +147,13 @@ const updateTopic = async (authorID, topicID, title) => {
 		title: title,
 	});
 
+	const user = await User.findOne({ where: { ID: authorID } });
+	if (!user) throw new Error("El autor no existe");
+	if (!user.ID) throw new Error("El autor no existe");
+
+	const log = await addLog(1, authorID, null, `${user.username} ha editado el topic ${updatedTopic.title}`, true, true, 'Topic Updated', user?.username)
+	if (!log) throw new Error("No log");
+
 	return updatedTopic;
 };
 
@@ -113,6 +167,13 @@ const deleteTopic = async (ID) => {
 			ID: ID,
 		},
 	});
+
+	const user = await User.findOne({ where: { ID: ID } });
+	if (!user) throw new Error("El autor no existe");
+	if (!user.ID) throw new Error("El autor no existe");
+
+	const log = await addLog(1, authorID, null, `${user.username} ha eliminado el topic ${topic.title}`, true, true, 'Topic deleted', user?.username)
+	if (!log) throw new Error("No log");
 
 	return topic;
 }

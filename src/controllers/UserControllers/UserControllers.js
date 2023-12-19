@@ -6,7 +6,8 @@
 //         \|  
 
 const { Op } = require("sequelize");
-const { User, Post, Topic, Roles } = require("../../db");
+const { sequelize } = require("../../db");
+const { User, Post, Topic, Roles, ActionLog } = require("../../db");
 const { generateDateOnly, generateDateTime } = require('../../utils/date')
 const bcrypt = require('bcrypt');
 const { uploadImage } = require('../imagesControllers')
@@ -17,12 +18,21 @@ const {
 	rolExist,
 	createRol
 } = require("../../controllers/Roles/userRoles");
+const {
+	quickSort,
+} = require('../../utils/SortAlgorithms')
 
-const { getAllLogs, addLog } = require('../Logs/LogsControllers')
+const { getAllLogs, addLog } = require('../Logs/LogsControllers');
+
+
 
 /// <=============== controller getAllUsers ===============>
 async function getAllUsersFromDb() {
-	const users = await User.findAll();
+	const users = await User.findAll({
+		attributes: {
+			exclude: ['password'], // Exclude the 'password' field
+		},
+	});
 	//Si la funcion no recibe nada, devuelve un error.
 	if (!users) throw new Error("No se encontraron usuarios");
 	return users;
@@ -30,9 +40,13 @@ async function getAllUsersFromDb() {
 
 /// <=============== controller getUSER ===============>
 async function getUserFromDb(userID) {
+	console.log(userID)
 	const matchingUser = await User.findOne({
 		where: {
 			ID: userID,
+		},
+		attributes: {
+			exclude: ['password'], // Exclude the 'password' field
 		},
 	});
 
@@ -46,6 +60,8 @@ async function getUserByUsername(username) {
 	const matchingUser = await User.findOne({
 		where: {
 			username: username,
+		}, attributes: {
+			exclude: ['password'], // Exclude the 'password' field
 		},
 	});
 
@@ -53,6 +69,100 @@ async function getUserByUsername(username) {
 	//Si la funcion no recibe nada, devuelve un error.
 	return matchingUser;
 }
+
+
+// <=============== controller getMostActiveUsers ===============>
+async function getMostActiveUsers() {
+	try {
+
+
+		const mostActiveUsers = await Post.findAll({
+			attributes: [
+				'authorID',
+				[sequelize.fn('COUNT', sequelize.literal('DISTINCT "Post"."ID"')), 'Cantidad'],
+			],
+			group: ['authorID', '"User"."ID"', '"User"."username"'],
+			order: [[sequelize.literal('COUNT("authorID")'), 'DESC']],
+			raw: true,
+			include: [
+				{
+					model: User,
+					attributes: ['profilePicture', 'username'],
+					where: sequelize.literal('"User"."ID" = "Post"."authorID"'),
+					required: false,
+				},
+			],
+		})
+
+
+		if (!mostActiveUsers || mostActiveUsers.length === 0) {
+			throw new Error("No se encontraron usuarios activos");
+		}
+
+
+		function mergeDuplicates(arr) {
+			// Creamos un array vacío para almacenar el resultado final
+			const mergedArr = [];
+			// Creamos un conjunto para realizar un seguimiento de los authorID que ya hemos visto
+			const seenAuthors = new Set();
+
+			// Iteramos sobre cada elemento del array original
+			for (const item of arr) {
+				// Obtenemos el authorID del elemento actual
+				const authorID = item.authorID;
+
+				// Verificamos si ya hemos visto este authorID
+				if (!seenAuthors.has(authorID)) {
+					// Si no lo hemos visto, añadimos el elemento al resultado y lo marcamos como visto
+					mergedArr.push(item);
+					seenAuthors.add(authorID);
+				} else {
+					// Si ya hemos visto este authorID, buscamos el elemento existente en el resultado
+					const existingItem = mergedArr.find(x => x.authorID === authorID);
+
+					// Actualizamos la propiedad "Cantidad" sumando los valores existente e actual
+					existingItem.Cantidad = (parseInt(existingItem.Cantidad) + parseInt(item.Cantidad)).toString();
+
+					// Si la propiedad "User.profilePicture" del elemento existente es nula,
+					// la actualizamos con la del elemento actual
+					if (existingItem["User.profilePicture"] === null) {
+						existingItem["User.profilePicture"] = item["User.profilePicture"];
+					}
+					if (existingItem["User.username"] === null) {
+						existingItem["User.username"] = item["User.username"];
+					}
+				}
+			}
+
+			const newARR = mergedArr.map((item) => {
+				const newItem =
+				{
+					authorID: item.authorID,
+					Cantidad: item.Cantidad,
+					username: item["User.username"],
+					avatar: item["User.profilePicture"]
+				}
+				// delete newItem["User.profilePicture"]
+				return newItem
+			})
+
+			// Devolvemos el array fusionado y actualizado
+			return newARR;
+		}
+
+		const mergeDuplicatesUsers = mergeDuplicates(mostActiveUsers)
+
+		const sortedUsers = quickSort(mergeDuplicatesUsers)
+
+		return sortedUsers;
+	} catch (error) {
+		console.error("Error al obtener usuarios activos:", error.message);
+		throw error;
+	}
+}
+
+
+
 
 /// <=============== CREATE USER ===============>
 async function createUser(
@@ -120,9 +230,9 @@ async function createUser(
 
 		if (!AddRoleToUser) throw new Error("El rol no pudo ser asignado");
 
-		addLog(1, user.ID, null, `${username} se ha unido a nosotros`, false, true)
+		const log = await addLog(1, user.ID, null, `${username} se ha unido a nosotros`, false, true, 'New User', username)
 
-		return { message: `El usuario ${username} ha sido creado correctamente`, type: true };
+		return { message: `El usuario ${username} ha sido creado correctamente`, type: true, log };
 	} catch (error) {
 		throw new Error("Error al crear el usuario: " + error.message);
 	}
@@ -189,6 +299,7 @@ async function updateUser(
 	if (!matchingUser) throw new Error("El usuario no existe");
 	console.log(updatedUser)
 
+	const log = await addLog(1, updatedUser.ID, null, `${updatedUser.username} ha actualizado su información: ${updatedUser}`, true, true, 'User updated', updatedUser?.username)
 
 
 	return updatedUser;
@@ -206,7 +317,10 @@ const AuthLogin = async (email, password) => {
 
 		const user = await User.findOne({
 			where: {
-				[Op.or]: [{ email: email }, { username: email }]
+				[Op.or]: [
+					{ email: { [Op.iLike]: email } },  // Utiliza Op.iLike para hacer la comparación sin distinguir mayúsculas/minúsculas
+					{ username: { [Op.iLike]: email } }
+				]
 			}
 		});
 
@@ -247,7 +361,7 @@ const AuthLogin = async (email, password) => {
 };
 
 
-//   ||==============| Upload Image |===============ooo<>
+//   ||==============| Delete User |===============ooo<>
 // To delete an user.
 const deleteUser = async (ID) => {
 	const user = await User.findByPk(ID)
@@ -263,12 +377,12 @@ const deleteUser = async (ID) => {
 	return user;
 }
 
-//   ||==============| Upload Image |===============ooo<>
+//   ||==============| Upload Profile Pic |===============ooo<>
 // Updates an user's profile picture.
 
 async function uploadProfilePicture(imagen64, ID) {
 	if (!imagen64) throw new Error("Falta userScore");
-	if (!ID) throw new Error("Falta ID, username o email del usuario");
+	if (!ID) throw new Error("Falta ID");
 
 
 	const matchingUser = await User.findOne({
@@ -286,7 +400,7 @@ async function uploadProfilePicture(imagen64, ID) {
 			link = await uploadImage(imagen64);
 		} catch (uploadError) {
 			console.log('Error during image upload:', uploadError);
-			throw new Error("Error al cargar la imagen");
+			throw new Error("Error al cargar la imagen " + uploadError);
 		}
 
 		if (!link) throw new Error("La función uploadImage no retornó un enlace válido");
@@ -305,7 +419,18 @@ async function uploadProfilePicture(imagen64, ID) {
 
 		if (!updateThisUser) throw new Error("Error al actualizar la imagen de perfil");
 
-		addLog(1, Number(ID), null, `${matchingUser?.username} ahora tiene una foto de perfil increible!`, false, true)
+
+		await addLog(1, Number(ID), null, `${matchingUser?.username} ahora tiene una foto de perfil increible!`, false, true, 'Profile picture updated', matchingUser?.username)
+		const updatedLog = await ActionLog.update(
+			{ avatar: link },
+			{
+				where: {
+					user_id: ID,
+				},
+			}
+		);
+		if (!updatedLog) throw new Error("Error al actualizar la imagen de perfil");
+		console.log(updatedLog)
 		return updateThisUser;
 	} catch (error) {
 		console.error('Error during profile picture upload:', error);
@@ -332,4 +457,5 @@ module.exports = {
 	deleteUser,
 	getUserFromDb,
 	getUserByUsername,
+	getMostActiveUsers,
 };
