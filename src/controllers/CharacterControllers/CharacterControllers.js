@@ -132,7 +132,7 @@ async function createCharacter(
 		await stats.setCharacter(character);
 		// await character.setStats(stats);
 		console.log('**/->ESTAMOS ACÁ<-/**' + userID)
-		await addLog(2, userID, character?.ID, `Acaba de dar vida a un nuevo personaje! ¡Den la bienvenida a ${character?.name} y prepárense para vivir grandes aventuras con él! 🎭📜✨`, false, true, 'Character created', matchingUser?.username)
+		await addLog(2, userID, character?.ID, `Acaba de dar vida a un nuevo personaje! 🎭📜✨`, false, true, 'Character created')
 
 		return { message: `El personaje ${name} ha sido creado correctamente`, type: true, character: character, stats: stats };
 	} catch (error) {

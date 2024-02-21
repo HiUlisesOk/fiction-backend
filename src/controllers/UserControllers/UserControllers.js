@@ -4,7 +4,7 @@
 //         /| ________________
 // O|===|* > ________________/ 
 //         \|  
-
+require("dotenv").config();
 const { Op } = require("sequelize");
 const { sequelize } = require("../../db");
 const { User, Post, Topic, Roles, ActionLog } = require("../../db");
@@ -230,7 +230,7 @@ async function createUser(
 
 		if (!AddRoleToUser) throw new Error("El rol no pudo ser asignado");
 
-		const log = await addLog(1, user.ID, null, `${username} se ha unido a nosotros`, false, true, 'New User', username)
+		const log = await addLog(1, user.ID, null, `se ha unido a nosotros`, false, true, 'New User')
 
 		return { message: `El usuario ${username} ha sido creado correctamente`, type: true, log };
 	} catch (error) {
@@ -249,8 +249,6 @@ async function updateUser(
 	birthDate,
 	bio,
 	email,
-	userScore,
-	profilePicture,
 ) {
 	//Si falta algun dato devolvemos un error
 	if (!ID) throw new Error("Falta ID del usuario");
@@ -260,13 +258,12 @@ async function updateUser(
 	if (!bio) throw new Error("Falta biography");
 	if (!birthDate) throw new Error("Falta birthDate");
 	if (!email) throw new Error("Falta email");
-	if (!userScore) throw new Error("Falta userScore");
 
 	const matchingUser = await User.findOne({
 		where: {
 			[Op.or]: [{ email: email }, { username: username }, { ID: ID }],
 		},
-		attributes: ['email', 'password'],
+		attributes: ['email'],
 	});
 
 	if (!matchingUser) throw new Error("El usuario no existe");
@@ -277,16 +274,16 @@ async function updateUser(
 			username: username,
 			firstName: firstName,
 			lastName: lastName,
-			profilePicture: profilePicture,
 			birthDate: generateDateOnly(),
 			bio: bio,
 			email: email,
-			userScore: userScore,
 		},
 		{
 			where: { ID: ID },
 		}
 	);
+
+	if (!updateThisUser) throw new Error("El usuario no existe");
 
 
 	const updatedUser = await User.findOne({
@@ -299,7 +296,7 @@ async function updateUser(
 	if (!matchingUser) throw new Error("El usuario no existe");
 	console.log(updatedUser)
 
-	const log = await addLog(1, updatedUser.ID, null, `${updatedUser.username} ha actualizado su información: ${updatedUser}`, true, true, 'User updated', updatedUser?.username)
+	const log = await addLog(1, updatedUser.ID, null, `ha actualizado su información: ${updatedUser}`, true, true, 'User updated')
 
 
 	return updatedUser;
@@ -360,6 +357,46 @@ const AuthLogin = async (email, password) => {
 	}
 };
 
+const jwt = require('jsonwebtoken');
+
+//   ||==============| Auth Token |===============ooo<>
+const AuthToken = async (token) => {
+	if (!token) throw new Error("token is required");
+	console.log(token)
+	try {
+		// Lógica de autenticación
+		// Consulta una base de datos para verificar las credenciales
+
+		const verifyToken = (token, secretKey) => {
+			try {
+				const decoded = jwt.verify(token, secretKey);
+				return { valid: true, expired: false, decoded };
+			} catch (error) {
+				if (error instanceof jwt.TokenExpiredError) {
+					return { valid: false, expired: true };
+				} else if (error instanceof jwt.JsonWebTokenError) {
+					return { valid: false, expired: false };
+				}
+			}
+		};
+
+		// Usage
+		const secretKey = process.env.secretToken;
+		const result = verifyToken(token, secretKey);
+
+		if (result.valid) {
+			return { status: true, message: 'Token is valid' };
+		} else if (result.expired) {
+			return { status: false, message: 'Token is expired' };
+		} else {
+			return { status: false, message: 'Token is invalid' };
+		}
+
+	} catch (error) {
+		return 'Authentication error: ' + error.message;
+	}
+};
+
 
 //   ||==============| Delete User |===============ooo<>
 // To delete an user.
@@ -381,7 +418,7 @@ const deleteUser = async (ID) => {
 // Updates an user's profile picture.
 
 async function uploadProfilePicture(imagen64, ID) {
-	if (!imagen64) throw new Error("Falta userScore");
+	if (!imagen64) throw new Error("Falta imagen en base 64");
 	if (!ID) throw new Error("Falta ID");
 
 
@@ -420,7 +457,7 @@ async function uploadProfilePicture(imagen64, ID) {
 		if (!updateThisUser) throw new Error("Error al actualizar la imagen de perfil");
 
 
-		await addLog(1, Number(ID), null, `${matchingUser?.username} ahora tiene una foto de perfil increible!`, false, true, 'Profile picture updated', matchingUser?.username)
+		await addLog(1, Number(ID), null, `ahora tiene una foto de perfil increible!`, false, true, 'Profile picture updated')
 		const updatedLog = await ActionLog.update(
 			{ avatar: link },
 			{
@@ -431,11 +468,50 @@ async function uploadProfilePicture(imagen64, ID) {
 		);
 		if (!updatedLog) throw new Error("Error al actualizar la imagen de perfil");
 		console.log(updatedLog)
-		return updateThisUser;
+		return link;
 	} catch (error) {
 		console.error('Error during profile picture upload:', error);
 		throw error;
 	}
+}
+
+//   ||==============| Update Banner Pic |===============ooo<>
+// Updates an user's banner picture.
+
+async function updateBannerPicture(link, ID) {
+	if (!link) throw new Error("Falta link");
+	if (!ID) throw new Error("Falta ID");
+
+
+	const matchingUser = await User.findOne({
+		where: {
+			ID: ID
+		}
+	});
+
+	if (!matchingUser) throw new Error("El usuario no existe");
+	// console.log(matchingUser);
+
+
+	const updateThisUser = await User.update(
+		{
+			profileBanner: link,
+		},
+		{
+			where: {
+				ID: ID
+			},
+		}
+	);
+
+	if (!updateThisUser) throw new Error("Error al actualizar la imagen del banner de perfil");
+
+
+	await addLog(1, Number(ID), null, `ahora tiene un banner increible!`, false, true, 'Banner picture updated')
+
+
+	return link;
+
 }
 
 // Ejemplo de middleware para verificar el rol de administrador
@@ -451,6 +527,7 @@ const isAdmin = (req, res, next) => {
 module.exports = {
 	getAllUsersFromDb,
 	uploadProfilePicture,
+	updateBannerPicture,
 	createUser,
 	AuthLogin,
 	updateUser,
@@ -458,4 +535,5 @@ module.exports = {
 	getUserFromDb,
 	getUserByUsername,
 	getMostActiveUsers,
+	AuthToken,
 };

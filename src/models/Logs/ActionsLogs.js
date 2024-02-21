@@ -15,10 +15,6 @@ module.exports = (sequelize) => {
 				type: DataTypes.INTEGER,
 				allowNull: true,
 			},
-			name: {
-				type: DataTypes.STRING,
-				allowNull: true,
-			},
 			action_type: {
 				type: DataTypes.STRING,
 				allowNull: true,
@@ -30,11 +26,6 @@ module.exports = (sequelize) => {
 			target_id: {
 				type: DataTypes.INTEGER,
 				allowNull: true,
-			},
-			avatar: {
-				type: DataTypes.STRING,
-				allowNull: true,
-				defaultValue: "https://via.placeholder.com/500x500",
 			},
 			info: {
 				type: DataTypes.STRING,

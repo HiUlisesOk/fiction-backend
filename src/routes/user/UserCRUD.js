@@ -12,12 +12,14 @@ const {
 	getAllUsersFromDb,
 	createUser,
 	AuthLogin,
+	AuthToken,
 	updateUser,
 	deleteUser,
 	uploadProfilePicture,
 	getUserFromDb,
 	getUserByUsername,
 	getMostActiveUsers,
+	updateBannerPicture,
 } = require("../../controllers/UserControllers/UserControllers");
 
 const { getRolesFromUserID } = require('../../controllers/Roles/userRoles')
@@ -158,6 +160,35 @@ userRouter.get("/get-user-info", async (req, res) => {
 	}
 });
 
+/**
+ * @swagger
+ * /AuthToken:
+ *   post:
+ *     tags:
+ *       - Authentication
+ *     summary: Autenticar un token valido
+ *     description: Autenticar un token valido
+ *     parameters:
+ *       - in: query
+ *         name: token
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The authentication token
+ *     responses:
+ *       200:
+ *         description: OK
+ *       400:
+ *         description: Error de solicitud inválida
+ */
+userRouter.post("/AuthToken", authenticateToken, async (req, res) => {
+	try {
+		res.status(200).send(true);
+	} catch (error) {
+		res.status(401).send({ status: false, error: error.message });
+	}
+});
+
 
 /**
  * @swagger
@@ -257,6 +288,54 @@ userRouter.post("/update-profilePicture", authenticateToken, userRestrict, async
 	}
 });
 
+
+/**
+ * @swagger
+ * /update-banner:
+ *   post:
+ *     tags:
+ *       - Users
+ *     summary: Actualizar la imagen del banner del perfil de un usuario
+ *     description: Actualiza la imagen del banner del perfil de un usuario específico
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               link:
+ *                 type: string
+ *               ID:
+ *                 type: integer
+ *             required:
+ *               - link
+ *               - ID
+ *     responses:
+ *       200:
+ *         description: OK
+ *       400:
+ *         description: Error de solicitud inválida
+ */
+userRouter.post("/update-banner", authenticateToken, userRestrict, async (req, res) => {
+	try {
+		const {
+			link,
+			ID,
+		} = req.body;
+
+		const profilePic = await updateBannerPicture(
+			link,
+			ID,
+		);
+		if (!profilePic) throw new Error("Error al actualizar la imagen de perfil");
+		res.status(200).send(profilePic);
+	} catch (error) {
+		res.status(400).send(error.message);
+	}
+});
+
 /**
  * @swagger
  * /update-user:
@@ -316,8 +395,6 @@ userRouter.put("/update-user", authenticateToken, userRestrict, async (req, res)
 			birthDate,
 			bio,
 			email,
-			userScore,
-			profilePicture,
 		} = req.body;
 
 		const user = await updateUser(
@@ -328,8 +405,6 @@ userRouter.put("/update-user", authenticateToken, userRestrict, async (req, res)
 			birthDate,
 			bio,
 			email,
-			userScore,
-			profilePicture,
 		);
 		res.status(200).send(user);
 	} catch (error) {

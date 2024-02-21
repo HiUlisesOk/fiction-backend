@@ -5,10 +5,10 @@
 // O|===|* > ________________/ 
 //         \|  
 
-const { Op } = require("sequelize");
+const { Op, where } = require("sequelize");
 const { User, Post, Topic } = require("../../db");
 const { generateDateOnly, generateDateTime } = require('../../utils/date')
-const { createPost } = require('./PostControllers')
+const { createPost, getPostByTopicId } = require('./PostControllers')
 const bcrypt = require('bcrypt');
 const { addLog } = require("../Logs/LogsControllers");
 const { sequelize } = require("../../db");
@@ -19,7 +19,12 @@ async function getTopicsById(id) {
 
 	const topic = await Topic.findByPk(id);
 	if (!topic) throw new Error("Topic not Found");
-	return topic;
+
+	const posts = await getPostByTopicId(id);
+
+	if (!posts) throw new Error("Posts not Found");
+
+	return { topic, posts };
 }
 
 /// <=============== controller getTopicByUserID ===============>
@@ -62,14 +67,66 @@ async function getTopicsByUserId(userID) {
 
 /// <=============== controller getLastActiveTopics ===============>
 async function getLastActiveTopics() {
+
 	const lastActiveTopics = await Topic.findAll({
 		order: [['updatedAt', 'DESC']],
 		group: ['ID'],
 		limit: 10,
+		raw: true,
+		include: [
+			{
+				model: User,
+				attributes: ['profilePicture', 'username'],
+				required: false,
+			},
+		],
 	});
 
-	console.log(lastActiveTopics);
-	return { lastActiveTopics };
+	if (!lastActiveTopics) throw new Error("No se encontraron Topics");
+
+	const getPosts = await Promise.all(lastActiveTopics.map(async (topic) => {
+		return await Post.findAll({
+			where: {
+				topicID: topic.ID,
+				authorID: topic.authorID,
+			},
+		});
+	}));
+
+
+	const postValues = getPosts.map((post, index) => {
+		return post.map((data, index) => {
+			return data.dataValues
+		});
+	}).flat();
+
+
+
+	const topicsWithContentOfFirstPost = lastActiveTopics.map((topic, index) => {
+		return {
+			...topic,
+			content: postValues[index].content,
+		};
+	});
+	console.log('topicsWithContentOfFirstPost: ', topicsWithContentOfFirstPost)
+	const cleanTopic = topicsWithContentOfFirstPost?.map(item => {
+		return {
+			ID: item?.ID,
+			title: item?.title,
+			author: item && item['Users.username'],
+			authorID: item?.authorID,
+			avatar: item && item['Users.profilePicture'],
+			image: item?.image || "/landingPage/landingPageBackground.jpg",
+			description: item?.content,
+			numberOfPosts: item?.postCount,
+			createdAt: item?.createdAt,
+			updatedAt: item?.updatedAt,
+		}
+	});
+
+	const topicsResult = [...cleanTopic]
+
+	return topicsResult;
 }
 
 
@@ -87,8 +144,8 @@ async function getAllTopicsFromDb() {
 			},
 		],
 	});
-	//Si la funcion no recibe nada, devuelve un error.
-	console.log(topics.getuserID)
+
+
 	if (!topics) throw new Error("No se encontraron Topics");
 
 
@@ -119,7 +176,7 @@ const CreateTopic = async (title, authorID, content) => {
 
 	await user.addTopic(topic);
 
-	const log = await addLog(1, authorID, null, `${user.username} ha creado el topic ${topic.title}`, true, true, 'New Topic', user?.username)
+	const log = await addLog(1, authorID, null, `ha creado el topic ${topic.title}`, true, true, 'New Topic')
 	if (!log) throw new Error("No log");
 
 	const newPost = await createPost(content, authorID, topic.dataValues.ID)
@@ -151,7 +208,7 @@ const updateTopic = async (authorID, topicID, title) => {
 	if (!user) throw new Error("El autor no existe");
 	if (!user.ID) throw new Error("El autor no existe");
 
-	const log = await addLog(1, authorID, null, `${user.username} ha editado el topic ${updatedTopic.title}`, true, true, 'Topic Updated', user?.username)
+	const log = await addLog(1, authorID, null, `ha editado el topic ${updatedTopic.title}`, true, true, 'Topic Updated')
 	if (!log) throw new Error("No log");
 
 	return updatedTopic;
@@ -172,7 +229,7 @@ const deleteTopic = async (ID) => {
 	if (!user) throw new Error("El autor no existe");
 	if (!user.ID) throw new Error("El autor no existe");
 
-	const log = await addLog(1, authorID, null, `${user.username} ha eliminado el topic ${topic.title}`, true, true, 'Topic deleted', user?.username)
+	const log = await addLog(1, authorID, null, `ha eliminado el topic ${topic.title}`, true, true, 'Topic deleted')
 	if (!log) throw new Error("No log");
 
 	return topic;

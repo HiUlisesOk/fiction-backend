@@ -17,7 +17,7 @@ require("./db.js");
 
 const server = express();
 server.name = "API";
-server.use(cors({ origin: ["http://localhost:5173", "http://localhost:3011", "http://localhost:3027"], credentials: true }));
+server.use(cors({ origin: ["http://localhost:5173", "http://localhost:3011", "http://localhost:3027", "http://localhost:3000"], credentials: true }));
 
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
 server.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));

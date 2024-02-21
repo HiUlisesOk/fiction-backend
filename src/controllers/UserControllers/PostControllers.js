@@ -93,7 +93,7 @@ const createPost = async (
     content: content,
     topicID: topic.ID,
   };
-  await addLog(1, user.ID, null, `${user.username} ha posteado en ${topic.title}`, false, true, 'New Topic', user.username)
+  await addLog(1, user.ID, null, `ha posteado en ${topic.title}`, false, true, 'New Topic')
   return newPost;
 };
 
@@ -120,7 +120,7 @@ const updatePost = async (
   const updatedPost = await matchingPost.update({
     content: content,
   });
-  await addLog(1, authorID, null, `${matchingUser?.username} editó su post ${postID} en el topic ${topicID}`, false, true, 'Post Updated', matchingUser?.username)
+  await addLog(1, authorID, null, `editó su post ${postID} en el topic ${topicID}`, false, true, 'Post Updated')
   return updatedPost;
 };
 
@@ -136,7 +136,7 @@ const deletePost = async (authorID) => {
     },
   });
   if (!user) throw new Error("No user ID");
-  const log = await addLog(1, post.authorID, null, `${user.username} ha borrado el post Nro ${post.topicID}`, true, true, 'Post Deleted', user?.username)
+  const log = await addLog(1, post.authorID, null, `ha borrado el post Nro ${post.topicID}`, true, true, 'Post Deleted')
   if (!log) throw new Error("No log");
   console.log(log)
   return post;

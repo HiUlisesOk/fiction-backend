@@ -28,6 +28,11 @@ module.exports = (sequelize) => {
 				allowNull: true,
 				defaultValue: "https://via.placeholder.com/500x500",
 			},
+			profileBanner: {
+				type: DataTypes.STRING,
+				allowNull: true,
+				defaultValue: "https://via.placeholder.com/1344x384",
+			},
 			birthDate: {
 				type: DataTypes.DATEONLY,
 				allowNull: true,

@@ -9,7 +9,8 @@ const { Router } = require("express");
 const logsRouter = Router();
 const { authenticateToken, isAdmin, userRestrict } = require('../../utils/Auth');
 const {
-	getAllLogs, getLastLogs
+	getAllLogs, getLastLogs,
+	getLogsbyId
 } = require("../../controllers/Logs/LogsControllers");
 
 const { getRolesFromUserID } = require('../../controllers/Roles/userRoles')
@@ -65,38 +66,38 @@ logsRouter.get("/get-last-logs", authenticateToken, async (req, res) => {
 	}
 });
 
-// /**
-//  * @swagger
-//  * /get-user-info/{id}:
-//  *   get:
-//  *     tags:
-//  *       - Users
-//  *     summary: Obtener información de un usuario por ID
-//  *     description: Obtiene la información de un usuario específico por su ID
-//  *     security:
-//  *       - bearerAuth: []
-//  *     parameters:
-//  *       - in: path
-//  *         name: id
-//  *         description: ID del usuario a obtener
-//  *         required: true
-//  *         schema:
-//  *           type: string
-//  *     responses:
-//  *       200:
-//  *         description: OK
-//  *       401:
-//  *         description: Error de autenticación
-//  */
-// logsRouter.get("/get-user-info/:id", authenticateToken, async (req, res) => {
-// 	try {
-// 		const userID = req.params.id;
-// 		const userInfo = await getUserFromDb(userID);
-// 		res.status(200).send(userInfo);
-// 	} catch (error) {
-// 		res.status(401).send(error.message);
-// 	}
-// });
+/**
+ * @swagger
+ * /get-logs-by-id/{id}:
+ *   get:
+ *     tags:
+ *       - Users
+ *     summary: Obtener información de la actividad de un usuario por ID
+ *     description: Obtiene la información de la actividad de un usuario específico por su ID
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         description: ID del usuario 
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: OK
+ *       401:
+ *         description: Error de autenticación
+ */
+logsRouter.get("/get-logs-by-id/:id", authenticateToken, async (req, res) => {
+	try {
+		const userID = req.params.id;
+		const userInfo = await getLogsbyId(userID);
+		res.status(200).send(userInfo);
+	} catch (error) {
+		res.status(401).send(error.message);
+	}
+});
 
 // /**
 //  * @swagger
